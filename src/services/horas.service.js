@@ -362,8 +362,10 @@ async function getHorasMensualDetalle(year, month) {
       sc.contract_no as fs_numero,
       TIME(scf.cf_932) as hora_inicio,
       TIME(scf.cf_934) as hora_fin,
-      TIME_TO_SEC(TIMEDIFF(scf.cf_934, scf.cf_932)) / 3600 as horas
+      TIME_TO_SEC(TIMEDIFF(scf.cf_934, scf.cf_932)) / 3600 as horas,
+      COALESCE(t.tickets, 0) as tickets
     ${FS_FROM}${FS_ACCOUNT}
+    LEFT JOIN (${buildRelSubquery(['HelpDesk'], 'tickets')}) t ON sc.servicecontractsid = t.fs_id
     WHERE DATE_FORMAT(scf.cf_960, '%Y-%m') = ?
     AND scf.cf_932 IS NOT NULL
     AND scf.cf_934 IS NOT NULL
@@ -376,26 +378,30 @@ async function getHorasMensualDetalle(year, month) {
   for (const row of rows) {
     const nombre = row.cliente || 'Sin Cliente';
     if (!clientesMap.has(nombre)) {
-      clientesMap.set(nombre, { nombre, accountid: row.accountid, total_horas: 0, total_fs: 0, dias: {} });
+      clientesMap.set(nombre, { nombre, accountid: row.accountid, total_horas: 0, total_fs: 0, total_tickets: 0, dias: {} });
     }
     const cliente = clientesMap.get(nombre);
     const fecha = row.fecha || '';
     if (!cliente.dias[fecha]) {
       cliente.dias[fecha] = {
         fecha, dia_semana: new Date(fecha + 'T12:00:00').getDay(),
-        horas: 0, fs_count: 0, tecnicos: new Set(), fs_list: []
+        horas: 0, fs_count: 0, tecnicos: new Set(), fs_list: [], tickets: 0
       };
     }
     const dia = cliente.dias[fecha];
     const h = parseFloat(row.horas) || 0;
+    const tkts = parseInt(row.tickets) || 0;
     dia.horas += h;
     dia.fs_count += 1;
+    dia.tickets += tkts;
     dia.tecnicos.add(`${row.first_name} ${row.last_name}`);
     const inicio = String(row.hora_inicio || '').substring(0, 5);
     const fin = String(row.hora_fin || '').substring(0, 5);
-    dia.fs_list.push(`${row.fs_numero || 'FS'} | ${row.first_name} ${row.last_name} | ${inicio}-${fin} (${h.toFixed(1)}h)`);
+    const tktLabel = tkts > 0 ? ` 🎫${tkts}` : '';
+    dia.fs_list.push(`${row.fs_numero || 'FS'} | ${row.first_name} ${row.last_name} | ${inicio}-${fin} (${h.toFixed(1)}h${tktLabel})`);
     cliente.total_horas += h;
     cliente.total_fs += 1;
+    cliente.total_tickets += tkts;
   }
 
   const clientes = [];
@@ -405,13 +411,15 @@ async function getHorasMensualDetalle(year, month) {
       diasArray[fecha] = {
         fecha: dia.fecha, dia_semana: dia.dia_semana,
         horas: Math.round(dia.horas * 100) / 100,
-        fs_count: dia.fs_count, tecnicos: dia.tecnicos.size, fs_list: dia.fs_list
+        fs_count: dia.fs_count, tickets: dia.tickets,
+        tecnicos: dia.tecnicos.size, fs_list: dia.fs_list
       };
     }
     clientes.push({
       nombre: cliente.nombre, accountid: cliente.accountid,
       total_horas: Math.round(cliente.total_horas * 100) / 100,
-      total_fs: cliente.total_fs, dias_visitados: Object.keys(cliente.dias).length,
+      total_fs: cliente.total_fs, total_tickets: cliente.total_tickets,
+      dias_visitados: Object.keys(cliente.dias).length,
       dias: diasArray
     });
   }

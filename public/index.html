@@ -657,7 +657,7 @@ function renderMensual() {
     for (const c of clientes) {
       html += `<div class="col-xl-3 col-lg-4 col-md-6"><div class="stat-card" onclick="showClienteCalendario('${c.nombre}')" style="cursor:pointer">
         <div class="num text-primary">${c.total_horas.toFixed(1)}h</div><div class="label">${c.nombre}</div>
-        <small class="text-muted">${c.total_fs} FS | ${c.dias_visitados} días</small></div></div>`;
+        <div class="text-muted small">${c.total_fs} FS | ${c.total_tickets || 0} tickets | ${c.dias_visitados} días</div></div></div>`;
     }
     html += '</div>';
     content.innerHTML = html;
@@ -675,7 +675,7 @@ function showClienteCalendario(nombre) {
   const firstDay = new Date(year, month - 1, 1).getDay();
   const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
   let html = `<div class="d-flex justify-content-between align-items-center mb-2"><h5 class="m-0">${cliente.nombre}</h5>
-    <div><span class="badge bg-primary fs-6">${cliente.total_horas.toFixed(1)}h</span> <span class="badge bg-secondary fs-6">${cliente.total_fs} FS</span> <span class="badge bg-info fs-6">${cliente.dias_visitados} días</span></div>
+    <div><span class="badge bg-primary fs-6">${cliente.total_horas.toFixed(1)}h</span> <span class="badge bg-secondary fs-6">${cliente.total_fs} FS</span> <span class="badge bg-info fs-6">${cliente.total_tickets || 0} tickets</span> <span class="badge bg-secondary fs-6">${cliente.dias_visitados} días</span></div>
   </div><div class="calendar-grid">`;
   for (const d of diasSemana) html += `<div class="cal-day-header">${d}</div>`;
   for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
@@ -683,7 +683,7 @@ function showClienteCalendario(nombre) {
     const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const dia = cliente.dias?.[dateStr];
     let bg = '#0d6efd', txt = '';
-    if (dia) { const h = dia.horas; bg = h >= 6 ? '#28a745' : h >= 3 ? '#ffc107' : '#dc3545'; txt = `${h.toFixed(1)}h`; }
+    if (dia) { const h = dia.horas; bg = h >= 6 ? '#28a745' : h >= 3 ? '#ffc107' : '#dc3545'; txt = `${h.toFixed(1)}h`; if (dia.tickets > 0) txt += ` 🎫${dia.tickets}`; }
     html += `<div class="cal-day" style="background:${bg}" onclick="showDiaDetalle('${nombre}','${dateStr}')" title="${dateStr}"><span>${day}</span><small style="font-size:0.6rem">${txt}</small></div>`;
   }
   html += '</div><div id="diaDetalle" class="mt-3"></div>';
@@ -695,7 +695,7 @@ function showDiaDetalle(clienteNombre, fecha) {
   const dia = cliente?.dias?.[fecha];
   if (!dia) return;
   const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-  let html = `<div class="card"><div class="card-header"><strong>${dias[dia.dia_semana]} ${fecha}</strong> — ${dia.horas.toFixed(1)}h | ${dia.fs_count} FS | ${dia.tecnicos} técnicos</div><div class="card-body p-2"><ul class="list-unstyled mb-0">`;
+  let html = `<div class="card"><div class="card-header"><strong>${dias[dia.dia_semana]} ${fecha}</strong> — ${dia.horas.toFixed(1)}h | ${dia.fs_count} FS | ${dia.tickets || 0} tickets | ${dia.tecnicos} técnicos</div><div class="card-body p-2"><ul class="list-unstyled mb-0">`;
   for (const fs of dia.fs_list) html += `<li class="small">${fs}</li>`;
   html += '</ul></div></div>';
   document.getElementById('diaDetalle').innerHTML = html;
