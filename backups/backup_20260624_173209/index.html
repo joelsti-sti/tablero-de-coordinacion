@@ -3,353 +3,269 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STI - Dashboard Unificado</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Dashboard Unificado</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; color: #1a1a2e; }
-
+body { background: #f8f9fa; }
 .tab-pane { display: none !important; }
 .tab-pane.active.show { display: block !important; }
-
-/* ===== SIDEBAR ===== */
-.sidebar { position: fixed; top: 0; left: 0; width: 240px; height: 100vh; background: #1a2030; z-index: 1030; display: flex; flex-direction: column; }
-.sidebar-brand { padding: 1.25rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.sidebar-brand h3 { font-size: 1rem; font-weight: 700; color: #fff; margin: 0; letter-spacing: 0.5px; }
-.sidebar-brand small { font-size: 0.65rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
-.sidebar-nav { flex: 1; overflow-y: auto; padding: 0.5rem 0; }
-.sidebar-nav .nav-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.6rem 1.25rem; color: rgba(255,255,255,0.55); cursor: pointer; font-size: 0.82rem; font-weight: 500; border-left: 3px solid transparent; transition: all 0.15s; text-decoration: none; }
-.sidebar-nav .nav-item:hover { color: #fff; background: rgba(255,255,255,0.04); }
-.sidebar-nav .nav-item.active { color: #fff; background: rgba(255,255,255,0.06); border-left-color: #4f8cff; }
-.sidebar-nav .nav-item .icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
-.sidebar-nav .nav-item .label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sidebar-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 0.4rem 1.25rem; }
-.sidebar-footer { padding: 0.75rem 1.25rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.65rem; color: rgba(255,255,255,0.3); text-align: center; }
-
-/* ===== TOPBAR ===== */
-.topbar { position: fixed; top: 0; left: 240px; right: 0; height: 56px; background: #fff; border-bottom: 1px solid #e8eaed; z-index: 1020; display: flex; align-items: center; padding: 0 1.5rem; gap: 1rem; }
-.topbar-title { font-size: 1rem; font-weight: 600; color: #1a1a2e; flex: 1; }
-.topbar-controls { display: flex; align-items: center; gap: 0.75rem; }
-.topbar-controls .form-control, .topbar-controls .form-select { font-size: 0.8rem; border-radius: 6px; border: 1px solid #d4d6da; }
-.topbar-clock { font-size: 0.8rem; font-weight: 500; color: #5f6368; padding: 0.25rem 0.75rem; background: #f0f2f5; border-radius: 6px; }
-
-/* ===== MAIN ===== */
-.main { margin-left: 240px; margin-top: 56px; padding: 1.5rem; min-height: calc(100vh - 56px); }
-
-/* ===== PANEL ===== */
-.panel { background: #fff; border-radius: 8px; border: 1px solid #e8eaed; padding: 1.25rem; }
-.panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e8eaed; }
-.panel-header h5 { font-size: 0.9rem; font-weight: 600; color: #1a1a2e; margin: 0; }
-.panel-subtabs { display: flex; gap: 0.25rem; }
-.panel-subtabs .btn { font-size: 0.75rem; padding: 0.3rem 0.75rem; border-radius: 4px; font-weight: 500; border: 1px solid #d4d6da; color: #5f6368; background: #fff; }
-.panel-subtabs .btn.active { background: #1a2030; color: #fff; border-color: #1a2030; }
-
-/* ===== CARDS ===== */
-.tech-card { background: #fff; border-radius: 8px; border: 1px solid #e8eaed; overflow: hidden; height: 100%; transition: box-shadow 0.2s; }
-.tech-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-.tech-header { padding: 1rem; color: #fff; text-align: center; cursor: pointer; }
-.tech-header.bg-success { background: #1b8a4a !important; }
-.tech-header.bg-warning { background: #c97a0c !important; }
-.tech-header.bg-danger { background: #c23333 !important; }
-.tech-name { font-size: 1rem; font-weight: 600; margin: 0; }
-.tech-hours { font-size: 1.6rem; font-weight: 700; margin: 0; }
-.fs-list { max-height: 0; overflow-y: auto; transition: max-height 0.25s; background: #f8f9fa; }
-.tech-card:hover .fs-list, .tech-card.show .fs-list { max-height: 400px; padding: 0.6rem; }
-.fs-item { padding: 0.3rem 0; border-bottom: 1px solid #e8eaed; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
+.nav-tabs .nav-link { font-weight: 600; color: #495057; border: none; padding: 0.75rem 1.25rem; }
+.nav-tabs .nav-link.active { background: white; border-bottom: 3px solid #0d6efd; color: #0d6efd; }
+.header-section { background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%); color: white; padding: 1.5rem 0; margin-bottom: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.tech-card { background: white; border-radius: 15px; padding: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease; overflow: hidden; height: 100%; }
+.tech-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+.tech-header { padding: 1.25rem; color: white; text-align: center; cursor: pointer; }
+.tech-header.bg-success { background: linear-gradient(135deg, #28a745, #20c997) !important; }
+.tech-header.bg-warning { background: linear-gradient(135deg, #ffc107, #fd7e14) !important; }
+.tech-header.bg-danger { background: linear-gradient(135deg, #dc3545, #c82333) !important; }
+.tech-name { font-size: 1.2rem; font-weight: 700; margin: 0; }
+.tech-hours { font-size: 2rem; font-weight: bold; margin: 0; }
+.fs-list { max-height: 0; overflow-y: auto; transition: max-height 0.3s ease; background: #f8f9fa; }
+.tech-card:hover .fs-list, .tech-card.show .fs-list { max-height: 400px; padding: 0.75rem; }
+.fs-item { padding: 0.4rem; border-bottom: 1px solid #eee; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; }
 .fs-item:last-child { border-bottom: none; }
-.ausencia-badge { display: inline-block; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.6rem; font-weight: 600; }
-.fs-time { color: #5f6368; font-size: 0.75rem; white-space: nowrap; margin-left: auto; padding-left: 0.5rem; }
-
-/* ===== BILLBOARD ===== */
-.billboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px; }
-.billboard-card { border-radius: 6px; padding: 10px; color: #fff; text-align: center; font-weight: 500; transition: opacity 0.2s; }
-.billboard-card:hover { opacity: 0.85; }
-.billboard-card .hours { font-size: 1.3rem; font-weight: 700; }
-.billboard-card .name { font-size: 0.75rem; }
-
-/* ===== STATS ===== */
-.stat-card { background: #fff; border-radius: 8px; padding: 1rem; border: 1px solid #e8eaed; text-align: center; height: 100%; }
-.stat-card .num { font-size: 1.6rem; font-weight: 700; }
-.stat-card .label { font-size: 0.68rem; text-transform: uppercase; color: #5f6368; letter-spacing: 0.3px; }
-
-/* ===== CALENDARIO ===== */
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-.cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600; color: #fff; min-height: 50px; padding: 2px; }
+.ausencia-badge { display: inline-block; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.65rem; font-weight: 600; line-height: 1.2; }
+.fs-time { color: #6c757d; font-size: 0.8rem; white-space: nowrap; margin-left: auto; padding-left: 0.5rem; }
+.fs-header { font-weight: 600; font-size: 0.85rem; color: #495057; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: white; min-height: 60px; padding: 2px; }
 .cal-day.empty { background: transparent !important; cursor: default; }
-.cal-day-header { font-weight: 600; text-align: center; padding: 3px; font-size: 0.7rem; color: #5f6368; }
-
-/* ===== TABLAS ===== */
-.table th { font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.3px; color: #5f6368; border-bottom: 2px solid #e8eaed; background: #f8f9fa; }
-.table td { font-size: 0.82rem; vertical-align: middle; }
-.fs-table { border: 1px solid #e8eaed; border-radius: 8px; overflow: hidden; }
-
-/* ===== KPI ===== */
-.kpi-section { background: #fff; border: 1px solid #e8eaed; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
-.kpi-section h4 { font-size: 0.9rem; font-weight: 600; color: #1a1a2e; border-bottom: 2px solid #1a2030; padding-bottom: 0.5rem; margin-bottom: 1rem; }
-.kpi-card { background: #f8f9fa; border-radius: 6px; padding: 1rem; text-align: center; border-left: 3px solid #1a2030; height: 100%; }
-.kpi-card .kpi-num { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
-.kpi-card .kpi-label { font-size: 0.7rem; color: #5f6368; text-transform: uppercase; letter-spacing: 0.3px; }
-.kpi-card.danger { border-left-color: #c23333; } .kpi-card.danger .kpi-num { color: #c23333; }
-.kpi-card.warning { border-left-color: #c97a0c; } .kpi-card.warning .kpi-num { color: #c97a0c; }
-.kpi-card.success { border-left-color: #1b8a4a; } .kpi-card.success .kpi-num { color: #1b8a4a; }
-.kpi-card.info { border-left-color: #1a73e8; } .kpi-card.info .kpi-num { color: #1a73e8; }
-.kpi-card.secondary { border-left-color: #5f6368; } .kpi-card.secondary .kpi-num { color: #5f6368; }
-.kpi-badge-ok { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.68rem; font-weight: 600; }
-.kpi-badge-ok.cumplido { background: #e6f4ea; color: #1b8a4a; }
-.kpi-badge-ok.nocumplido { background: #fce8e8; color: #c23333; }
-.kpi-table th { background: #f8f9fa; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.3px; color: #5f6368; }
-.kpi-table td { font-size: 0.82rem; }
-.kpi-table .highlight-cell { font-weight: 700; font-size: 1rem; }
-.kpi-ausencia-item { display: inline-block; padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.68rem; margin: 1px; }
-.kpi-ausencia-item.justificado { background: #e6f4ea; color: #1b8a4a; }
-.kpi-ausencia-item.injustificado { background: #fce8e8; color: #c23333; }
-.kpi-ausencia-item.autorizado { background: #fef7e0; color: #c97a0c; }
-.kpi-ausencia-item.medica { background: #f0e6f6; color: #6c3b8a; }
-.kpi-ausencia-item.demora { background: #fef7e0; color: #c97a0c; }
-.kpi-tech-header { font-weight: 600; font-size: 0.95rem; color: #1a1a2e; }
-.kpi-progress { height: 4px; border-radius: 2px; background: #e8eaed; margin-top: 4px; }
-.kpi-progress .kpi-progress-bar { height: 100%; border-radius: 2px; background: #1b8a4a; transition: width 0.6s; }
-.kpi-pdf-header { display: none; text-align: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 2px solid #1a1a2e; }
-.kpi-pdf-header h2 { font-weight: 800; margin: 0; font-size: 1.2rem; }
-.kpi-pdf-header p { color: #5f6368; margin: 0; font-size: 0.8rem; }
-
-/* ===== COMPARE ===== */
-.compare-table th { position: sticky; top: 0; background: #1a2030; color: rgba(255,255,255,0.8); z-index: 10; font-size: 0.72rem; }
-.compare-table td { font-size: 0.75rem; }
-.badge-method { font-size: 0.6rem; }
-
-/* ===== FILTERS ===== */
-.filter-dropdown { display: none; position: absolute; top: 100%; left: 0; z-index: 1050; background: #fff; border: 1px solid #d4d6da; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-width: 200px; max-height: 400px; overflow-y: auto; padding: 0.3rem 0; }
+.cal-day-header { font-weight: 700; text-align: center; padding: 4px; font-size: 0.75rem; color: #6c757d; }
+.compare-table { font-size: 0.8rem; }
+.compare-table th { position: sticky; top: 0; background: #212529; color: #adb5bd; z-index: 10; }
+.badge-method { font-size: 0.65rem; }
+.ocs-filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.ocs-filter-row input, .ocs-filter-row select { flex: 1; min-width: 140px; }
+.stat-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; }
+.stat-card .num { font-size: 2rem; font-weight: 700; }
+.stat-card .label { font-size: 0.75rem; text-transform: uppercase; color: #6c757d; letter-spacing: 0.5px; }
+.kpi-section { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+.kpi-section h4 { font-weight: 700; color: #1a1a2e; border-bottom: 3px solid #0d6efd; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+.kpi-section h5 { font-weight: 600; color: #2d3436; }
+.kpi-card { background: #f8f9fa; border-radius: 10px; padding: 1.2rem; text-align: center; border-left: 4px solid #0d6efd; height: 100%; }
+.kpi-card .kpi-num { font-size: 2rem; font-weight: 800; line-height: 1.2; }
+.kpi-card .kpi-label { font-size: 0.8rem; color: #636e72; text-transform: uppercase; letter-spacing: 0.5px; }
+.kpi-card.danger { border-left-color: #dc3545; } .kpi-card.danger .kpi-num { color: #dc3545; }
+.kpi-card.warning { border-left-color: #f39c12; } .kpi-card.warning .kpi-num { color: #f39c12; }
+.kpi-card.success { border-left-color: #28a745; } .kpi-card.success .kpi-num { color: #28a745; }
+.kpi-card.info { border-left-color: #17a2b8; } .kpi-card.info .kpi-num { color: #17a2b8; }
+.kpi-card.secondary { border-left-color: #6c757d; } .kpi-card.secondary .kpi-num { color: #6c757d; }
+.kpi-badge-ok { display: inline-block; padding: 0.25rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.kpi-badge-ok.cumplido { background: #d4edda; color: #155724; }
+.kpi-badge-ok.nocumplido { background: #f8d7da; color: #721c24; }
+.kpi-table th { background: #f1f3f5; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px; color: #495057; border-bottom: 2px solid #dee2e6; }
+.kpi-table td { vertical-align: middle; font-size: 0.9rem; }
+.kpi-table .highlight-cell { font-weight: 700; font-size: 1.1rem; }
+.kpi-ausencia-item { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin: 1px; }
+.kpi-ausencia-item.justificado { background: #d1ecf1; color: #0c5460; }
+.kpi-ausencia-item.injustificado { background: #f8d7da; color: #721c24; }
+.kpi-ausencia-item.autorizado { background: #fff3cd; color: #856404; }
+.kpi-ausencia-item.medica { background: #e2d5f1; color: #6c3b8a; }
+.kpi-ausencia-item.demora { background: #ffeaa7; color: #6b5300; }
+.kpi-tech-header { font-weight: 700; font-size: 1.1rem; color: #1a1a2e; }
+.kpi-progress { height: 6px; border-radius: 3px; background: #eee; margin-top: 4px; }
+.kpi-progress .kpi-progress-bar { height: 100%; border-radius: 3px; background: #28a745; transition: width 0.6s ease; }
+.kpi-pdf-header { display: none; text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #333; }
+.kpi-pdf-header h2 { font-weight: 800; margin: 0; }
+.kpi-pdf-header p { color: #555; margin: 0; font-size: 0.9rem; }
+.tab-content { background: white; border-radius: 0 0 12px 12px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+.tab-pane { min-height: 300px; }
+.billboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.billboard-card { border-radius: 8px; padding: 12px; color: white; text-align: center; font-weight: 600; }
+.billboard-card .name { font-size: 0.85rem; }
+.billboard-card .hours { font-size: 1.5rem; font-weight: 700; }
+.text-green { color: #28a745; } .text-yellow { color: #ffc107; } .text-red { color: #dc3545; }
+#filterInput { max-width: 300px; }
+.fs-table { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.filter-dropdown { display: none; position: absolute; top: 100%; left: 0; z-index: 1050; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); min-width: 220px; max-height: 500px; overflow-y: auto; padding: 0.4rem 0; }
 .filter-dropdown.show { display: block; }
-.filter-dropdown label { display: block; padding: 0.25rem 0.75rem; margin: 0; font-weight: 400; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
-.filter-dropdown label:hover { background: #f0f2f5; }
-.filter-dropdown label input { margin-right: 0.35rem; }
-.filter-dropdown-all { border-bottom: 1px solid #e8eaed; font-weight: 600 !important; }
-
-@media (max-width: 768px) {
-  .sidebar { width: 56px; }
-  .sidebar .sidebar-brand h3, .sidebar .sidebar-brand small, .sidebar .nav-item .label { display: none; }
-  .sidebar .nav-item { justify-content: center; padding: 0.6rem; }
-  .topbar { left: 56px; }
-  .main { margin-left: 56px; }
-}
+.filter-dropdown label { display: block; padding: 0.3rem 0.8rem; margin: 0; font-weight: 400; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
+.filter-dropdown label:hover { background: #f5f5f5; }
+.filter-dropdown label input { margin-right: 0.4rem; }
+.filter-dropdown-all { border-bottom: 1px solid #eee; font-weight: 600 !important; }
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <div class="sidebar-brand">
-    <h3>STI</h3>
-    <small>Dashboard Unificado</small>
-  </div>
-  <div class="sidebar-nav">
-    <div class="nav-item active" data-tab="horas"><span class="icon">📊</span><span class="label">Horas</span></div>
-    <div class="nav-item" data-tab="detalle"><span class="icon">📋</span><span class="label">Detalle FS</span></div>
-    <div class="nav-item" data-tab="mensual"><span class="icon">📅</span><span class="label">Mensual</span></div>
-    <div class="sidebar-divider"></div>
-    <div class="nav-item" data-tab="tareas"><span class="icon">📝</span><span class="label">Tareas Pendientes</span></div>
-    <div class="nav-item" data-tab="tickets"><span class="icon">🎫</span><span class="label">Tickets Pendientes</span></div>
-    <div class="sidebar-divider"></div>
-    <div class="nav-item" data-tab="comparacion"><span class="icon">🔍</span><span class="label">CRM / OCS / ESET</span></div>
-    <div class="nav-item" data-tab="ocs"><span class="icon">🖥️</span><span class="label">Inventario OCS</span></div>
-    <div class="sidebar-divider"></div>
-    <div class="nav-item" data-tab="kpi"><span class="icon">📊</span><span class="label">KPI Mensual</span></div>
-    <div class="nav-item" data-tab="sinasociar"><span class="icon">⚠️</span><span class="label">Sin Asociar</span></div>
-  </div>
-  <div class="sidebar-footer">v2.0 &middot; STI</div>
-</div>
-
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="topbar-title" id="topbarTitle">Horas</div>
-  <div class="topbar-controls">
-    <input type="date" id="globalDate" class="form-control form-control-sm">
-    <input type="text" id="filterInput" class="form-control form-control-sm" placeholder="Filtrar...">
-    <span class="topbar-clock" id="clock"></span>
+<div class="header-section">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2 class="m-0">Dashboard Unificado</h2>
+      <div class="d-flex gap-2 align-items-center">
+        <input type="date" id="globalDate" class="form-control form-control-sm" style="max-width:180px">
+        <input type="text" id="filterInput" class="form-control form-control-sm" placeholder="Filtrar técnico...">
+        <span id="clock" class="badge bg-light text-dark fs-6"></span>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- MAIN -->
-<div class="main">
+<div class="container">
+  <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+    <li class="nav-item"><button class="nav-link active" data-tab="horas">📊 Horas</button></li>
+    <li class="nav-item"><button class="nav-link" data-tab="detalle">📋 Detalle FS</button></li>
+    <li class="nav-item"><button class="nav-link" data-tab="mensual">📅 Mensual</button></li>
+    <li class="nav-item"><button class="nav-link" data-tab="comparacion">🔍 CRM/OCS/ESET</button></li>
+    <li class="nav-item"><button class="nav-link" data-tab="ocs">🖥️ Inventario OCS</button></li>
+    <li class="nav-item"><button class="nav-link" data-tab="tareas">📝 Tareas Pendientes</button></li>
+    <li class="nav-item"><button class="nav-link" data-tab="tickets">🎫 Tickets Pendientes</button></li>
+    <li class="nav-item"><button class="nav-link" data-tab="kpi">📋 KPI Mensual</button></li>
+    <li class="nav-item"><button class="nav-link" data-tab="sinasociar">⚠️ Sin Asociar</button></li>
+  </ul>
+
   <div class="tab-content">
 
     <!-- TAB 1: HORAS -->
     <div class="tab-pane active show" id="tab-horas">
-      <div class="panel">
-        <div class="panel-header">
-          <h5>Horas del Día</h5>
-          <div class="panel-subtabs">
-            <button class="btn" data-subtab="resumen">Resumen</button>
-            <button class="btn" data-subtab="reales">Horas Reales</button>
-            <button class="btn active" data-subtab="billboard">Billboard</button>
-          </div>
-        </div>
-        <div id="horasContent"><div class="text-center py-5 text-muted">Cargando...</div></div>
+      <div class="d-flex gap-2 mb-3 flex-wrap">
+        <button class="btn btn-outline-primary btn-sm" data-subtab="resumen">Resumen</button>
+        <button class="btn btn-outline-primary btn-sm" data-subtab="reales">Horas Reales</button>
+        <button class="btn btn-outline-primary btn-sm active" data-subtab="billboard">Billboard</button>
       </div>
+      <div id="horasContent"><div class="text-center py-5 text-muted">Cargando...</div></div>
     </div>
 
     <!-- TAB 2: DETALLE FS -->
     <div class="tab-pane" id="tab-detalle">
-      <div class="panel">
-        <div class="panel-header">
-          <h5>Detalle de Formularios</h5>
-          <div>
-            <span id="detalleCount" class="text-muted small me-2"></span>
-            <span id="detalleError" class="text-danger small"></span>
-          </div>
-        </div>
-        <div class="table-responsive"><table class="table table-sm table-hover" id="detalleTable"><thead class="table-dark"><tr><th>Técnico</th><th>FS</th><th>Cliente</th><th>Fecha</th><th>Inicio</th><th>Fin</th><th>Horas</th><th>Tickets</th><th>Tareas</th></tr></thead><tbody id="detalleBody"></tbody></table></div>
+      <div class="d-flex justify-content-between mb-2">
+        <span id="detalleCount" class="text-muted small"></span>
+        <span id="detalleError" class="text-danger small"></span>
       </div>
+      <div class="table-responsive"><table class="table table-sm table-hover" id="detalleTable"><thead class="table-dark"><tr><th>Técnico</th><th>FS</th><th>Cliente</th><th>Fecha</th><th>Inicio</th><th>Fin</th><th>Horas</th><th>Tickets</th><th>Tareas</th></tr></thead><tbody id="detalleBody"></tbody></table></div>
     </div>
 
     <!-- TAB 3: MENSUAL -->
     <div class="tab-pane" id="tab-mensual">
-      <div class="panel">
-        <div class="panel-header">
-          <h5>Vista Mensual por Cliente</h5>
-          <div class="d-flex gap-2">
-            <input type="month" id="mesSelector" class="form-control form-control-sm">
-            <input type="text" id="clienteSearch" class="form-control form-control-sm" placeholder="Buscar cliente..." style="width:180px">
-          </div>
-        </div>
-        <div id="mensualContent"><div class="text-center py-5 text-muted">Seleccioná un mes</div></div>
+      <div class="row mb-3">
+        <div class="col-auto"><input type="month" id="mesSelector" class="form-control form-control-sm"></div>
+        <div class="col"><input type="text" id="clienteSearch" class="form-control form-control-sm" placeholder="Buscar cliente..."></div>
       </div>
+      <div id="mensualContent"><div class="text-center py-5 text-muted">Seleccioná un mes</div></div>
     </div>
 
-    <!-- TAB 4: COMPARACION -->
+    <!-- TAB 4: COMPARACION CRM/OCS/ESET -->
     <div class="tab-pane" id="tab-comparacion">
-      <div class="panel">
-        <div class="panel-header">
-          <h5>Comparación CRM / OCS / ESET</h5>
-          <span id="cmpStatus" class="text-muted small"></span>
-        </div>
-        <div class="row mb-3 g-2">
-          <div class="col-auto"><select id="cmpCliente" class="form-select form-select-sm" style="min-width:260px"><option>Seleccionar cliente...</option></select></div>
-          <div class="col-auto"><button class="btn btn-primary btn-sm" id="btnComparar">Comparar</button></div>
-          <div class="col-auto"><button class="btn btn-outline-secondary btn-sm" id="btnReloadOCS">Recargar Caché OCS</button></div>
-        </div>
-        <div class="row g-2 mb-3" id="cmpStats"></div>
-        <div class="mb-2 small" id="cmpSummary"></div>
-        <div class="table-responsive"><table class="table table-sm table-hover compare-table" id="cmpTable"><thead class="table-dark"></thead><tbody></tbody></table></div>
+      <div class="row mb-3 g-2">
+        <div class="col-auto"><select id="cmpCliente" class="form-select form-select-sm" style="min-width:280px"><option>Seleccionar cliente...</option></select></div>
+        <div class="col-auto"><button class="btn btn-primary btn-sm" id="btnComparar">Comparar</button></div>
+        <div class="col-auto"><button class="btn btn-success btn-sm" id="btnReloadOCS">Recargar Caché OCS</button></div>
+        <div class="col-auto"><span id="cmpStatus" class="text-muted align-self-center small"></span></div>
       </div>
+      <div class="row g-2 mb-3" id="cmpStats"></div>
+      <div class="mb-2 small" id="cmpSummary"></div>
+      <div class="table-responsive"><table class="table table-sm table-hover compare-table" id="cmpTable"><thead class="table-dark"></thead><tbody></tbody></table></div>
     </div>
 
-    <!-- TAB 5: OCS -->
+    <!-- TAB 5: INVENTARIO OCS -->
     <div class="tab-pane" id="tab-ocs">
-      <div class="panel">
-        <div class="panel-header">
-          <h5>Inventario OCS</h5>
-          <span class="badge bg-secondary" id="ocsCount"></span>
-        </div>
-        <div class="row mb-2 g-2">
-          <div class="col-auto"><select id="ocsWg" class="form-select form-select-sm"><option value="TODOS">Todos los clientes</option></select></div>
-          <div class="col"><input type="text" id="ocsSearch" class="form-control form-control-sm" placeholder="Buscar por nombre..."></div>
-          <div class="col-auto"><select id="ocsTipo" class="form-select form-select-sm"><option value="">Todos</option><option value="fisico">Físicos</option><option value="virtual">Virtuales</option></select></div>
-        </div>
-        <div id="ocsError"></div>
-        <div class="row g-2 mb-3" id="ocsStats"></div>
-        <div class="table-responsive"><table class="table table-sm table-hover" id="ocsTable"><thead class="table-dark"></thead><tbody></tbody></table></div>
+      <div class="row mb-2 g-2">
+        <div class="col-auto"><select id="ocsWg" class="form-select form-select-sm"><option value="TODOS">Todos los clientes</option></select></div>
+        <div class="col"><input type="text" id="ocsSearch" class="form-control form-control-sm" placeholder="Buscar por nombre..."></div>
+        <div class="col-auto"><select id="ocsTipo" class="form-select form-select-sm"><option value="">Todos</option><option value="fisico">Físicos</option><option value="virtual">Virtuales</option></select></div>
+        <div class="col-auto"><span class="badge bg-secondary align-self-center" id="ocsCount"></span></div>
       </div>
+      <div id="ocsError"></div>
+      <div class="row g-2 mb-3" id="ocsStats"></div>
+      <div class="table-responsive"><table class="table table-sm table-hover" id="ocsTable"><thead class="table-dark"></thead><tbody></tbody></table></div>
     </div>
 
-    <!-- TAB 6: TAREAS -->
+    <!-- TAB 6: TAREAS PENDIENTES -->
     <div class="tab-pane" id="tab-tareas">
-      <div class="panel">
-        <div class="panel-header">
-          <h5>Tareas Pendientes sin Solución</h5>
-          <h5 class="mb-0 text-warning" id="totalTareasCount">0</h5>
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <label class="form-label">Mes:</label>
+          <input type="month" id="tareasMonth" class="form-control">
         </div>
-        <div class="row mb-3">
-          <div class="col-auto"><input type="month" id="tareasMonth" class="form-control form-control-sm"></div>
-          <div class="col-auto"><button class="btn btn-primary btn-sm" onclick="fetchTareasPendientes()">Consultar</button></div>
+        <div class="col-md-3 d-flex align-items-end">
+          <button class="btn btn-warning" onclick="fetchTareasPendientes()">Consultar</button>
         </div>
-        <div class="fs-table">
-          <table class="table table-hover mb-0">
-            <thead><tr>
-              <th>Fecha</th><th>Tarea</th><th>N°</th><th>Proyecto</th><th>N° Proyecto</th><th>Estado</th>
-              <th style="position:relative;">Técnico<button class="btn btn-sm btn-outline-secondary ms-1 py-0" onclick="toggleFilterDropdown('tareasTecFilterDropdown')" style="font-size:0.65rem;">▼</button>
+        <div class="col-md-6 text-end">
+          <h5 class="mb-0 mt-3 mt-md-0">Total tareas sin solución: <strong id="totalTareasCount" class="text-warning">0</strong></h5>
+        </div>
+      </div>
+      <div class="fs-table">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Fecha</th><th>Tarea</th><th>N° Tarea</th><th>Proyecto</th><th>N° Proyecto</th><th>Estado</th>
+              <th style="position:relative;">
+                Técnico
+                <button class="btn btn-sm btn-outline-secondary ms-1 py-0" onclick="toggleFilterDropdown('tareasTecFilterDropdown')" style="font-size:0.7rem;">▼</button>
                 <div id="tareasTecFilterDropdown" class="filter-dropdown">
                   <label class="filter-dropdown-all"><input type="checkbox" onchange="toggleAllTareasTec(this)" checked> Todos</label>
                   <div id="tareasTecFilterList"></div>
                 </div>
               </th>
-            </tr></thead>
-            <tbody id="tareasTableBody"><tr><td colspan="7" class="text-center text-muted">Seleccione un mes y haga clic en Consultar</td></tr></tbody>
-          </table>
-        </div>
+            </tr>
+          </thead>
+          <tbody id="tareasTableBody"><tr><td colspan="7" class="text-center text-muted">Seleccione un mes y haga clic en Consultar</td></tr></tbody>
+        </table>
       </div>
     </div>
 
-    <!-- TAB 7: TICKETS -->
+    <!-- TAB 7: TICKETS PENDIENTES -->
     <div class="tab-pane" id="tab-tickets">
-      <div class="panel">
-        <div class="panel-header">
-          <h5>Tickets Pendientes sin Solución</h5>
-          <h5 class="mb-0 text-info" id="totalTicketsCount">0</h5>
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <label class="form-label">Mes:</label>
+          <input type="month" id="ticketsMonth" class="form-control">
         </div>
-        <div class="row mb-3">
-          <div class="col-auto"><input type="month" id="ticketsMonth" class="form-control form-control-sm"></div>
-          <div class="col-auto"><button class="btn btn-primary btn-sm" onclick="fetchTicketsPendientes()">Consultar</button></div>
+        <div class="col-md-3 d-flex align-items-end">
+          <button class="btn btn-info" onclick="fetchTicketsPendientes()">Consultar</button>
         </div>
-        <div class="fs-table">
-          <table class="table table-hover mb-0">
-            <thead><tr>
+        <div class="col-md-6 text-end">
+          <h5 class="mb-0 mt-3 mt-md-0">Total tickets sin solución: <strong id="totalTicketsCount" class="text-info">0</strong></h5>
+        </div>
+      </div>
+      <div class="fs-table">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
               <th>Fecha</th><th>Ticket</th><th>Título</th><th>Cliente</th><th>Estado</th>
-              <th style="position:relative;">Técnico<button class="btn btn-sm btn-outline-secondary ms-1 py-0" onclick="toggleFilterDropdown('ticketsTecFilterDropdown')" style="font-size:0.65rem;">▼</button>
+              <th style="position:relative;">
+                Técnico
+                <button class="btn btn-sm btn-outline-secondary ms-1 py-0" onclick="toggleFilterDropdown('ticketsTecFilterDropdown')" style="font-size:0.7rem;">▼</button>
                 <div id="ticketsTecFilterDropdown" class="filter-dropdown">
                   <label class="filter-dropdown-all"><input type="checkbox" onchange="toggleAllTicketsTec(this)" checked> Todos</label>
                   <div id="ticketsTecFilterList"></div>
                 </div>
               </th>
-            </tr></thead>
-            <tbody id="ticketsTableBody"><tr><td colspan="6" class="text-center text-muted">Seleccione un mes y haga clic en Consultar</td></tr></tbody>
-          </table>
-        </div>
+            </tr>
+          </thead>
+          <tbody id="ticketsTableBody"><tr><td colspan="6" class="text-center text-muted">Seleccione un mes y haga clic en Consultar</td></tr></tbody>
+        </table>
       </div>
     </div>
 
-    <!-- TAB 8: KPI -->
+    <!-- TAB 8: KPI MENSUAL -->
     <div class="tab-pane" id="tab-kpi">
-      <div class="panel">
-        <div class="panel-header">
-          <h5>KPI Mensual</h5>
-          <div class="d-flex gap-2 align-items-center">
-            <input type="month" id="kpiMes" class="form-control form-control-sm" style="width:160px">
-            <button class="btn btn-primary btn-sm" id="btnCargarKPI">Cargar</button>
-            <span id="kpiPeriodo"></span>
-            <button class="btn btn-outline-secondary btn-sm" id="btnExportKPI" style="display:none" onclick="exportKPI_PDF()">📄 PDF</button>
-          </div>
-        </div>
-        <div id="kpiContent"><div class="text-center py-5 text-muted">Hacé clic en Cargar</div></div>
+      <div class="row mb-3">
+        <div class="col-auto"><input type="month" id="kpiMes" class="form-control form-control-sm"></div>
+        <div class="col-auto"><button class="btn btn-primary btn-sm" id="btnCargarKPI">Cargar</button></div>
+        <div class="col-auto" id="kpiPeriodo"></div>
+        <div class="col-auto ms-auto"><button class="btn btn-outline-secondary btn-sm" id="btnExportKPI" style="display:none" onclick="exportKPI_PDF()">📄 Exportar PDF</button></div>
       </div>
+      <div id="kpiContent"><div class="text-center py-5 text-muted">Hacé clic en Cargar</div></div>
     </div>
 
-    <!-- TAB 9: SIN ASOCIAR -->
+    <!-- TAB 9: SIN ASOCIAR + NEGATIVOS -->
     <div class="tab-pane" id="tab-sinasociar">
-      <div class="panel">
-        <div class="panel-header">
-          <h5>FS Sin Asociar / Negativos</h5>
-          <div class="panel-subtabs">
-            <button class="btn active" data-subtab="sinasociar_dia">Sin Asociar (día)</button>
-            <button class="btn" data-subtab="sinasociar_mes">Sin Asociar (mes)</button>
-            <button class="btn" data-subtab="negativos">Negativos (día)</button>
-            <button class="btn" data-subtab="negativos_mes">Negativos (mes)</button>
-          </div>
-        </div>
-        <div id="sinAsociarContent"><div class="text-center py-5 text-muted">Cargando...</div></div>
-      </div>
+      <ul class="nav nav-pills mb-3">
+        <li class="nav-item"><button class="nav-link active" data-subtab="sinasociar_dia">Sin Asociar (día)</button></li>
+        <li class="nav-item"><button class="nav-link" data-subtab="sinasociar_mes">Sin Asociar (mensual)</button></li>
+        <li class="nav-item"><button class="nav-link" data-subtab="negativos">Negativos (día)</button></li>
+        <li class="nav-item"><button class="nav-link" data-subtab="negativos_mes">Negativos (mensual)</button></li>
+      </ul>
+      <div id="sinAsociarContent"><div class="text-center py-5 text-muted">Cargando...</div></div>
     </div>
 
-  </div>
-
-  <div class="text-center mt-4 pb-3">
-    <small class="text-muted">Dashboard Unificado &middot; STI &middot; <span id="footerTime"></span></small>
   </div>
 </div>
 
-
+<div class="container mt-3 mb-4">
+  <hr>
+  <p class="text-muted text-center small mb-0">Dashboard Unificado | v2.0 | <span id="footerTime"></span></p>
+</div>
 
 <script>
 const API = '';
@@ -441,13 +357,6 @@ async function init() {
 // ============================================================
 // TAB SYSTEM
 // ============================================================
-const TAB_TITLES = {
-  horas: 'Horas del Día', detalle: 'Detalle de Formularios', mensual: 'Vista Mensual',
-  comparacion: 'Comparación CRM / OCS / ESET', ocs: 'Inventario OCS',
-  tareas: 'Tareas Pendientes', tickets: 'Tickets Pendientes',
-  kpi: 'KPI Mensual', sinasociar: 'FS Sin Asociar'
-};
-
 function setupTabs() {
   document.querySelectorAll('[data-tab]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -456,7 +365,6 @@ function setupTabs() {
       btn.classList.add('active');
       const tab = btn.dataset.tab;
       document.getElementById('tab-' + tab).classList.add('active', 'show');
-      document.getElementById('topbarTitle').textContent = TAB_TITLES[tab] || tab;
       if (tab === 'horas') { document.getElementById('filterInput').value = ''; loadHoras(); }
       else if (tab === 'detalle') loadDetalle();
       else if (tab === 'mensual') loadMensual();
