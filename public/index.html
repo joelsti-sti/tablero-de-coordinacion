@@ -119,9 +119,18 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
 .kpi-pdf-header p { color: #5f6368; margin: 0; font-size: 0.8rem; }
 
 /* ===== COMPARE ===== */
-.compare-table th { position: sticky; top: 0; background: #1a2030; color: rgba(255,255,255,0.8); z-index: 10; font-size: 0.72rem; }
-.compare-table td { font-size: 0.75rem; }
-.badge-method { font-size: 0.6rem; }
+.compare-table th { position: sticky; top: 0; background: #1a2030; color: rgba(255,255,255,0.8); z-index: 10; font-size: 0.72rem; white-space: nowrap; }
+.compare-table td { font-size: 0.75rem; vertical-align: middle; }
+.compare-table tr.match-3 { background: #e8f5e9; }
+.compare-table tr.match-2 { background: #fff8e1; }
+.compare-table tr.match-1 { background: #ffebee; }
+.compare-table tr.match-3:hover { background: #c8e6c9 !important; }
+.compare-table tr.match-2:hover { background: #ffecb3 !important; }
+.compare-table tr.match-1:hover { background: #ffcdd2 !important; }
+.badge-method { font-size: 0.65rem; font-weight: 500; }
+.cmp-summary-card { background: #fff; border-radius: 8px; padding: 0.6rem 1rem; border: 1px solid #e8eaed; display: inline-flex; align-items: center; gap: 0.5rem; }
+.cmp-summary-card .cmp-count { font-weight: 700; font-size: 1.1rem; }
+.cmp-summary-card .cmp-label { font-size: 0.72rem; color: #5f6368; }
 
 /* ===== FILTERS ===== */
 .filter-dropdown { display: none; position: absolute; top: 100%; left: 0; z-index: 1050; background: #fff; border: 1px solid #d4d6da; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-width: 200px; max-height: 400px; overflow-y: auto; padding: 0.3rem 0; }
@@ -776,37 +785,53 @@ function renderCmp() {
   let html = ''; let est = 0, fis = 0, vir = 0;
   (cmpData.contracts || []).forEach(c => { est += parseInt(c.estacionesTrabajo||0); fis += parseInt(c.servidoresFisicos||0); vir += parseInt(c.servidoresVirtuales||0); });
   if (cmpData.contracts?.length) {
-    html += `<div class="col-auto"><div class="stat-card"><div class="num text-info">${est}</div><div class="label">Estaciones</div></div></div>`;
-    html += `<div class="col-auto"><div class="stat-card"><div class="num text-info">${fis}</div><div class="label">Serv. Físicos</div></div></div>`;
-    html += `<div class="col-auto"><div class="stat-card"><div class="num text-info">${vir}</div><div class="label">Serv. Virtuales</div></div></div>`;
+    html += `<div class="col-auto"><div class="stat-card border-info"><div class="num text-info">${est}</div><div class="label">Estaciones contrato</div></div></div>`;
+    html += `<div class="col-auto"><div class="stat-card border-info"><div class="num text-info">${fis}</div><div class="label">Serv. Físicos</div></div></div>`;
+    html += `<div class="col-auto"><div class="stat-card border-info"><div class="num text-info">${vir}</div><div class="label">Serv. Virtuales</div></div></div>`;
   }
-  html += `<div class="col-auto"><div class="stat-card"><div class="num text-primary">${cmpData.totalCRM}</div><div class="label">CRM</div></div></div>`;
-  html += `<div class="col-auto"><div class="stat-card"><div class="num text-success">${cmpData.totalOCS}</div><div class="label">OCS</div></div></div>`;
-  html += `<div class="col-auto"><div class="stat-card"><div class="num text-warning">${cmpData.totalESET}</div><div class="label">ESET</div></div></div>`;
+  html += `<div class="col-auto"><div class="stat-card border-primary" style="border-left:3px solid #0d6efd"><div class="num text-primary">${cmpData.totalCRM}</div><div class="label">CRM</div></div></div>`;
+  html += `<div class="col-auto"><div class="stat-card border-success" style="border-left:3px solid #198754"><div class="num text-success">${cmpData.totalOCS}</div><div class="label">OCS Inventory</div></div></div>`;
+  html += `<div class="col-auto"><div class="stat-card border-warning" style="border-left:3px solid #ffc107"><div class="num text-warning">${cmpData.totalESET}</div><div class="label">ESET Protect</div></div></div>`;
   document.getElementById('cmpStats').innerHTML = html;
   const s = cmpData.summary;
-  document.getElementById('cmpSummary').innerHTML = `<strong>${cmpData.cliente}</strong> — <span class="text-success fw-bold">${s.enTres}</span> en 3 | <span class="text-primary fw-bold">${s.crmOcs}</span> CRM+OCS | <span class="text-warning fw-bold">${s.crmEset}</span> CRM+ESET | <span class="text-info fw-bold">${s.ocsEset}</span> OCS+ESET | Solo CRM: <b>${s.soloCrm}</b> | Solo OCS: <b>${s.soloOcs}</b> | Solo ESET: <b>${s.soloEset}</b>`;
+  const totalMatched = s.enTres + s.crmOcs + s.crmEset + s.ocsEset + s.soloCrm + s.soloOcs + s.soloEset;
+  document.getElementById('cmpSummary').innerHTML = `
+    <strong class="me-3">${cmpData.cliente}</strong>
+    <span class="cmp-summary-card border-success"><span class="cmp-count text-success">${s.enTres}</span><span class="cmp-label">En 3</span></span>
+    <span class="cmp-summary-card border-primary"><span class="cmp-count text-primary">${s.crmOcs}</span><span class="cmp-label">CRM+OCS</span></span>
+    <span class="cmp-summary-card border-warning"><span class="cmp-count text-warning">${s.crmEset}</span><span class="cmp-label">CRM+ESET</span></span>
+    <span class="cmp-summary-card border-info"><span class="cmp-count text-info">${s.ocsEset}</span><span class="cmp-label">OCS+ESET</span></span>
+    <span class="cmp-summary-card border-danger"><span class="cmp-count text-danger">${s.soloCrm}</span><span class="cmp-label">Solo CRM</span></span>
+    <span class="cmp-summary-card border-danger"><span class="cmp-count text-danger">${s.soloOcs}</span><span class="cmp-label">Solo OCS</span></span>
+    <span class="cmp-summary-card border-danger"><span class="cmp-count text-danger">${s.soloEset}</span><span class="cmp-label">Solo ESET</span></span>
+    <span class="text-muted ms-2 small">${totalMatched} dispositivos</span>`;
   const devs = cmpData.matchedDevices || [];
   const tbl = document.getElementById('cmpTable');
-  tbl.querySelector('thead').innerHTML = `<tr><th>Match</th><th colspan="4">OCS</th><th colspan="5">CRM</th><th colspan="4">ESET</th></tr><tr><th></th><th>Hostname</th><th>Serial</th><th>MAC</th><th>UUID</th><th>Hostname</th><th>Usuario</th><th>Activo</th><th>Serial</th><th>MAC</th><th>Hostname</th><th>Serial</th><th>MAC</th><th>UUID</th></tr>`;
+  tbl.querySelector('thead').innerHTML = `<tr>
+    <th style="min-width:60px">Match</th>
+    <th colspan="3"><span class="badge bg-success me-1">OCS</span>Hostname · Serial · MAC</th>
+    <th colspan="4"><span class="badge bg-primary me-1">CRM</span>Hostname · Usuario · Serial · MAC</th>
+    <th colspan="3"><span class="badge bg-warning text-dark me-1">ESET</span>Hostname · Serial · MAC</th>
+  </tr>`;
   let rows = '';
   for (const d of devs) {
     const method = d.matchMethod || 'none';
+    const coverage = (d.crm.present ? 1 : 0) + (d.ocs.present ? 1 : 0) + (d.eset.present ? 1 : 0);
+    const rowClass = 'match-' + coverage;
+    const methodColors = { serial: 'bg-success', hostname: 'bg-info text-dark', mac: 'bg-primary', uuid: 'bg-secondary', none: 'bg-secondary' };
+    const methodColor = methodColors[method] || 'bg-secondary';
     const fmtMac = macs => macs ? (Array.isArray(macs) ? macs.join(', ') : macs) : '-';
-    rows += `<tr><td><span class="badge bg-secondary badge-method">${method}</span></td>
-      <td class="text-success">${d.ocs.present ? (d.ocs.hostname || '-') : '-'}</td>
+    rows += `<tr class="${rowClass}"><td><span class="badge ${methodColor} badge-method">${method}</span></td>
+      <td class="text-success">${d.ocs.present ? (d.ocs.hostname || '-') : '<span class="text-muted">-</span>'}</td>
       <td class="small">${d.ocs.present ? (d.ocs.serialNumber || '-') : ''}</td>
       <td class="small">${d.ocs.present ? fmtMac(d.ocs.macAddress) : ''}</td>
-      <td class="small" style="font-size:0.6rem">${d.ocs.present ? (d.ocs.uuid || '-') : ''}</td>
-      <td class="text-primary">${d.crm.present ? (d.crm.hostname || '-') : '-'}</td>
+      <td class="text-primary">${d.crm.present ? (d.crm.hostname || '-') : '<span class="text-muted">-</span>'}</td>
       <td class="small">${d.crm.present ? (d.crm.contactName || '-') : ''}</td>
-      <td>${d.crm.present ? (d.crm.usuarioActivo ? '<span class="badge bg-success">SI</span>' : '<span class="badge bg-danger">NO</span>') : ''}</td>
       <td class="small">${d.crm.present ? (d.crm.serialNumber || '-') : ''}</td>
       <td class="small">${d.crm.present ? fmtMac(d.crm.macAddress) : ''}</td>
-      <td class="text-warning">${d.eset.present ? (d.eset.hostname || '-') : '-'}</td>
+      <td class="text-warning">${d.eset.present ? (d.eset.hostname || '-') : '<span class="text-muted">-</span>'}</td>
       <td class="small">${d.eset.present ? (d.eset.serialNumber || '-') : ''}</td>
       <td class="small">${d.eset.present ? fmtMac(d.eset.macAddress) : ''}</td>
-      <td class="small" style="font-size:0.6rem">${d.eset.present ? (d.eset.uuid || '-') : ''}</td>
     </tr>`;
   }
   tbl.querySelector('tbody').innerHTML = rows;
