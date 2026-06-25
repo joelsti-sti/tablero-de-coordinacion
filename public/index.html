@@ -215,7 +215,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
           <h5>Vista Mensual por Cliente</h5>
           <div class="d-flex gap-2">
             <input type="month" id="mesSelector" class="form-control form-control-sm">
-            <input type="text" id="clienteSearch" class="form-control form-control-sm" placeholder="Buscar cliente..." style="width:180px">
+            <select id="clienteSelect" class="form-select form-select-sm" style="width:250px">
+              <option value="">-- Seleccionar cliente --</option>
+            </select>
           </div>
         </div>
         <div id="mensualContent"><div class="text-center py-5 text-muted">Seleccioná un mes</div></div>
@@ -510,13 +512,13 @@ function renderHorasSubtab(subtab) {
     let data = horasData || [];
     if (filter) data = data.filter(t => `${t.first_name} ${t.last_name}`.toLowerCase().includes(filter));
     let total = data.reduce((s, t) => s + parseFloat(t.total_hours || 0), 0);
-    let html = `<div class="mb-2"><strong>Total horas: ${total.toFixed(2)}</strong></div><div class="row g-3">`;
+    let html = `<div class="mb-2"><strong>Total horas: ${fmtHrs(total)}</strong></div><div class="row g-3">`;
     for (const t of data) {
       const h = parseFloat(t.total_hours) || 0;
       const cls = h >= 8 ? 'bg-success' : h >= 5 ? 'bg-warning text-dark' : 'bg-danger';
       const tecName = `${t.first_name} ${t.last_name}`;
       html += `<div class="col-xl-3 col-lg-4 col-md-6"><div class="tech-card">
-        <div class="tech-header ${cls}" onclick="goToDetalleTecnico('${tecName.replace(/'/g, "\\'")}')"><div class="tech-name">${tecName}</div><div class="tech-hours">${h.toFixed(2)}</div><small>${t.fs_count} FS</small></div>
+        <div class="tech-header ${cls}" onclick="goToDetalleTecnico('${tecName.replace(/'/g, "\\'")}')"><div class="tech-name">${tecName}</div><div class="tech-hours">${fmtHrs(h)}</div><small>${t.fs_count} FS</small></div>
         <div class="fs-list">${(t.fs_list || '').split('|').map(f => `<div class="fs-item"><span>${f.trim()}</span></div>`).join('')}</div>
       </div></div>`;
     }
@@ -527,7 +529,7 @@ function renderHorasSubtab(subtab) {
     let tecnicos = data?.tecnicos || [];
     if (filter) tecnicos = tecnicos.filter(t => `${t.first_name} ${t.last_name}`.toLowerCase().includes(filter));
     let total = tecnicos.reduce((s, t) => s + parseFloat(t.horasReales || 0), 0);
-    let html = `<div class="mb-2"><strong>Total horas reales: ${total.toFixed(2)}</strong></div>`;
+    let html = `<div class="mb-2"><strong>Total horas reales: ${fmtHrs(total)}</strong></div>`;
     if (data?.horasSinCarga?.length) {
       html += `<div class="alert alert-warning py-1 px-2 mb-2"><strong>Horas sin carga:</strong> ${data.horasSinCarga.join(', ')}</div>`;
     }
@@ -551,7 +553,7 @@ function renderHorasSubtab(subtab) {
       const tecName = `${t.first_name} ${t.last_name}`;
       const encodedList = encodeURIComponent(JSON.stringify(t.fs_list || []));
       html += `<div class="col-xl-3 col-lg-4 col-md-6"><div class="tech-card">
-        <div class="tech-header ${cls}" onclick="goToDetalleTecnico('${tecName.replace(/'/g, "\\'")}')"><div class="tech-name">${tecName}</div><div class="tech-hours">${h.toFixed(2)}</div><small>${t.fs_count} FS</small></div>
+        <div class="tech-header ${cls}" onclick="goToDetalleTecnico('${tecName.replace(/'/g, "\\'")}')"><div class="tech-name">${tecName}</div><div class="tech-hours">${fmtHrs(h)}</div><small>${t.fs_count} FS</small></div>
         <div class="fs-list"><div class="d-flex justify-content-between align-items-center mb-2"><div class="fs-header mb-0">FS cargados</div>
           <button class="btn btn-sm btn-outline-secondary" onclick="copyRealesFsList(this, '${encodedList}')">📋 Copiar</button></div>
           <div style="user-select:text">${fsItems}</div></div>
@@ -567,7 +569,7 @@ function renderHorasSubtab(subtab) {
       const h = parseFloat(t.horasReales) || 0;
       const cls = h >= 8 ? 'bg-success' : h >= 5 ? 'bg-warning' : 'bg-danger';
       const tecName = `${t.first_name} ${t.last_name}`;
-      html += `<div class="billboard-card ${cls}" onclick="goToDetalleTecnico('${tecName.replace(/'/g, "\\'")}')" style="cursor:pointer"><div class="hours">${h.toFixed(1)}</div><div class="name">${tecName}</div></div>`;
+      html += `<div class="billboard-card ${cls}" onclick="goToDetalleTecnico('${tecName.replace(/'/g, "\\'")}')" style="cursor:pointer"><div class="hours">${fmtHrs(h)}</div><div class="name">${tecName}</div></div>`;
     }
     html += '</div>';
     content.innerHTML = html;
@@ -637,7 +639,17 @@ function renderDetalle() {
 // ============================================================
 // MENSUAL
 // ============================================================
-document.getElementById('mesSelector').addEventListener('change', () => { selectedCliente = null; loadMensual(); });
+document.getElementById('mesSelector').addEventListener('change', () => { loadMensual(); });
+document.getElementById('clienteSelect').addEventListener('change', function() {
+  const content = document.getElementById('mensualContent');
+  const nombre = this.value;
+  if (nombre) {
+    content.innerHTML = '<div id="clienteCalendar" class="mt-3"></div>';
+    showClienteCalendario(nombre);
+  } else {
+    content.innerHTML = '<div class="text-muted text-center py-4 small">Seleccioná un cliente para ver su calendario mensual</div>';
+  }
+});
 
 async function loadMensual() {
   const val = document.getElementById('mesSelector').value;
@@ -652,46 +664,27 @@ async function loadMensual() {
   }
 }
 
-let selectedCliente = null;
-
 function renderMensual() {
   const content = document.getElementById('mensualContent');
   let clientes = mensualData;
   if (!Array.isArray(clientes)) clientes = [];
-  const search = (document.getElementById('clienteSearch').value || '').toLowerCase();
-  const filtered = search ? clientes.filter(c => c.nombre.toLowerCase().includes(search)) : [];
+  const sel = document.getElementById('clienteSelect');
+  if (!sel) return;
 
-  let html = `<div style="position:relative;max-width:400px"><input type="text" id="clienteSearch" class="form-control form-control-sm" placeholder="Buscar cliente..." autocomplete="off" oninput="renderMensual()">
-    <div id="clienteDropdown" style="display:${search ? 'block' : 'none'};position:absolute;top:100%;left:0;right:0;z-index:10;background:#fff;border:1px solid #dee2e6;border-radius:4px;max-height:300px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.1)">`;
-  if (search && filtered.length === 0) {
-    html += '<div class="p-2 text-muted small">Sin resultados</div>';
-  } else if (search) {
-    for (const c of filtered) {
-      html += `<div class="p-2 small" style="cursor:pointer;border-bottom:1px solid #f1f3f5" onclick="selectCliente('${c.nombre.replace(/'/g, "\\'")}')"><strong>${c.nombre}</strong> <span class="text-muted">${c.total_horas.toFixed(1)}h · ${c.total_fs} FS${c.total_tickets ? ' · ' + c.total_tickets + ' tickets' : ''} · ${c.dias_visitados} días</span></div>`;
-    }
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">-- Seleccionar cliente --</option>';
+  for (const c of clientes) {
+    sel.innerHTML += `<option value="${c.nombre.replace(/"/g, '&quot;')}">${c.nombre}</option>`;
   }
-  html += '</div></div>';
+  sel.value = prev;
 
-  if (selectedCliente) {
-    html += '<div id="clienteCalendar" class="mt-3"></div>';
-    content.innerHTML = html;
-    showClienteCalendario(selectedCliente);
+  const nombre = sel.value;
+  if (nombre) {
+    content.innerHTML = '<div id="clienteCalendar" class="mt-3"></div>';
+    showClienteCalendario(nombre);
   } else {
-    if (search && filtered.length === 1) {
-      selectedCliente = filtered[0].nombre;
-      content.innerHTML = html;
-      showClienteCalendario(selectedCliente);
-    } else {
-      content.innerHTML = html + '<div class="text-muted text-center py-4 small">Escribí un cliente para ver su calendario mensual</div>';
-    }
+    content.innerHTML = '<div class="text-muted text-center py-4 small">Seleccioná un cliente para ver su calendario mensual</div>';
   }
-}
-
-function selectCliente(nombre) {
-  document.getElementById('clienteSearch').value = nombre;
-  selectedCliente = nombre;
-  document.getElementById('clienteDropdown').style.display = 'none';
-  renderMensual();
 }
 
 function showClienteCalendario(nombre) {
@@ -703,7 +696,7 @@ function showClienteCalendario(nombre) {
   const firstDay = new Date(year, month - 1, 1).getDay();
   const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
   let html = `<div class="d-flex justify-content-between align-items-center mb-2"><h5 class="m-0">${cliente.nombre}</h5>
-    <div class="d-flex gap-1 flex-wrap"><span class="badge text-bg-light fw-normal">${cliente.total_horas.toFixed(1)}h</span> <span class="badge text-bg-light fw-normal">${cliente.total_fs} FS</span>${cliente.total_tickets ? ` <span class="badge text-bg-light fw-normal">${cliente.total_tickets} tickets</span>` : ''} <span class="badge text-bg-light fw-normal">${cliente.dias_visitados} días</span></div>
+    <div class="d-flex gap-1 flex-wrap"><span class="badge text-bg-light fw-normal">${fmtHrs(cliente.total_horas)}</span> <span class="badge text-bg-light fw-normal">${cliente.total_fs} FS</span>${cliente.total_tickets ? ` <span class="badge text-bg-light fw-normal">${cliente.total_tickets} tickets</span>` : ''} <span class="badge text-bg-light fw-normal">${cliente.dias_visitados} días</span></div>
   </div><div class="calendar-grid">`;
   for (const d of diasSemana) html += `<div class="cal-day-header">${d}</div>`;
   for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
@@ -716,7 +709,7 @@ function showClienteCalendario(nombre) {
       if (h >= 8) cls += ' bg-success-subtle border-success-subtle';
       else if (h >= 5) cls += ' bg-warning-subtle border-warning-subtle';
       else if (h > 0) cls += ' bg-danger-subtle border-danger-subtle';
-      let info = `${h.toFixed(1)}h`;
+      let info = fmtHrs(h);
       if (dia.tickets > 0) info += ` · ${dia.tickets}t`;
       html += `<div class="cal-day ${cls}" onclick="showDiaDetalle('${nombre}','${dateStr}')" title="${dateStr}"><span class="day-num">${day}</span><span class="day-info">${info}</span></div>`;
     } else {
@@ -732,7 +725,7 @@ function showDiaDetalle(clienteNombre, fecha) {
   const dia = cliente?.dias?.[fecha];
   if (!dia) return;
   const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-  let html = `<div class="border rounded p-2 mt-2 bg-light" style="font-size:0.8rem"><div class="fw-semibold mb-1">${dias[dia.dia_semana]} ${fecha} — ${dia.horas.toFixed(1)}h · ${dia.fs_count} FS${dia.tickets ? ' · ' + dia.tickets + ' tickets' : ''} · ${dia.tecnicos} técnicos</div><ul class="list-unstyled mb-0" style="line-height:1.5">`;
+  let html = `<div class="border rounded p-2 mt-2 bg-light" style="font-size:0.8rem"><div class="fw-semibold mb-1">${dias[dia.dia_semana]} ${fecha} — ${fmtHrs(dia.horas)} · ${dia.fs_count} FS${dia.tickets ? ' · ' + dia.tickets + ' tickets' : ''} · ${dia.tecnicos} técnicos</div><ul class="list-unstyled mb-0" style="line-height:1.5">`;
   for (const fs of dia.fs_list) html += `<li>${fs}</li>`;
   html += '</ul></div>';
   document.getElementById('diaDetalle').innerHTML = html;
@@ -1171,7 +1164,7 @@ function renderKpi(data) {
     <th>Tecnico</th><th class="text-center">Dias Trab.</th><th class="text-center">Horas</th><th class="text-center">Promedio Diario</th><th class="text-center">FS/Dia</th><th class="text-center">Eficiencia Tareas</th><th class="text-center">Ausencias</th><th>Estado</th>
   </tr></thead><tbody>`;
   for (const t of tec) {
-    const promDiario = t.dias_trabajados > 0 ? (t.horas_totales / t.dias_trabajados).toFixed(1) : '0.0';
+    const promDiario = t.dias_trabajados > 0 ? fmtHrs(t.horas_totales / t.dias_trabajados) : '0:00';
     const fsDia = t.dias_trabajados > 0 ? (t.fs_total / t.dias_trabajados).toFixed(1) : '0.0';
     const eficiencia = (t.tareas_completadas + t.tickets_resueltos) > 0 ? 'Ok' : 'Sin actividad';
     const totalIncidencias = t.ausencias.length + t.demoras.length;
@@ -1181,7 +1174,7 @@ function renderKpi(data) {
     html += `<tr><td><strong>${t.nombre}</strong></td>
       <td class="text-center">${t.dias_trabajados}</td>
       <td class="text-center">${fmtHrs(t.horas_totales)}</td>
-      <td class="text-center">${promDiario}h</td>
+      <td class="text-center">${promDiario}</td>
       <td class="text-center">${fsDia}</td>
       <td class="text-center">${eficiencia}</td>
       <td class="text-center">${totalIncidencias > 0 ? `<span class="text-${estadoClass}">${totalIncidencias}</span>` : '-'}</td>

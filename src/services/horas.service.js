@@ -398,7 +398,10 @@ async function getHorasMensualDetalle(year, month) {
     const inicio = String(row.hora_inicio || '').substring(0, 5);
     const fin = String(row.hora_fin || '').substring(0, 5);
     const tktLabel = tkts > 0 ? ` 🎫${tkts}` : '';
-    dia.fs_list.push(`${row.fs_numero || 'FS'} | ${row.first_name} ${row.last_name} | ${inicio}-${fin} (${h.toFixed(1)}h${tktLabel})`);
+    const hrs = Math.floor(Math.abs(h));
+    const mins = Math.round((Math.abs(h) - hrs) * 60);
+    const hhmm = (h < 0 ? '-' : '') + hrs + ':' + String(mins).padStart(2, '0');
+    dia.fs_list.push(`${row.fs_numero || 'FS'} | ${row.first_name} ${row.last_name} | ${inicio}-${fin} (${hhmm}${tktLabel})`);
     cliente.total_horas += h;
     cliente.total_fs += 1;
     cliente.total_tickets += tkts;
