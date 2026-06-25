@@ -821,11 +821,8 @@ function renderCmp() {
     <th>Usuario CRM</th>
     <th>Activo</th>
     <th>CRM Serial</th>
-    <th>CRM MAC</th>
     <th>OCS Serial</th>
-    <th>OCS MAC</th>
     <th>ESET Serial</th>
-    <th>ESET MAC</th>
   </tr>`;
   let rows = '';
   for (const d of devs) {
@@ -834,7 +831,6 @@ function renderCmp() {
     const rowClass = 'match-' + coverage;
     const methodColors = { serial: 'bg-success', hostname: 'bg-info text-dark', mac: 'bg-primary', uuid: 'bg-secondary', none: 'bg-secondary' };
     const methodColor = methodColors[method] || 'bg-secondary';
-    const fmtMac = macs => macs ? (Array.isArray(macs) ? macs.join(', ') : macs) : '-';
     const hostname = d.crm.hostname || d.ocs.hostname || d.eset.hostname || '-';
     const sources = [];
     if (d.crm.present) sources.push('CRM');
@@ -846,11 +842,8 @@ function renderCmp() {
       <td class="small">${d.crm.present ? (d.crm.contactName || '-') : '<span class="text-muted">-</span>'}</td>
       <td class="small">${d.crm.present ? (d.crm.usuarioActivo ? '<span class="badge bg-success" style="font-size:0.6rem">SI</span>' : '<span class="badge bg-danger" style="font-size:0.6rem">NO</span>') : '<span class="text-muted">-</span>'}</td>
       <td class="small">${d.crm.present ? (d.crm.serialNumber || '-') : '<span class="text-muted">-</span>'}</td>
-      <td class="small" style="font-size:0.65rem">${d.crm.present ? fmtMac(d.crm.macAddress) : '<span class="text-muted">-</span>'}</td>
       <td class="small">${d.ocs.present ? (d.ocs.serialNumber || '-') : '<span class="text-muted">-</span>'}</td>
-      <td class="small" style="font-size:0.65rem">${d.ocs.present ? fmtMac(d.ocs.macAddress) : '<span class="text-muted">-</span>'}</td>
       <td class="small">${d.eset.present ? (d.eset.serialNumber || '-') : '<span class="text-muted">-</span>'}</td>
-      <td class="small" style="font-size:0.65rem">${d.eset.present ? fmtMac(d.eset.macAddress) : '<span class="text-muted">-</span>'}</td>
     </tr>`;
   }
   tbl.querySelector('tbody').innerHTML = rows;
