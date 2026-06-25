@@ -120,7 +120,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
 
 /* ===== COMPARE ===== */
 .compare-table th { position: sticky; top: 0; background: #1a2030; color: rgba(255,255,255,0.8); z-index: 10; font-size: 0.72rem; white-space: nowrap; }
+.compare-table th:first-child, .compare-table td:first-child { width: 65px; }
 .compare-table td { font-size: 0.75rem; vertical-align: middle; }
+.compare-table th:nth-child(2), .compare-table td:nth-child(2) { min-width: 130px; }
 .compare-table tr.match-3 { background: #e8f5e9; }
 .compare-table tr.match-2 { background: #fff8e1; }
 .compare-table tr.match-1 { background: #ffebee; }
@@ -815,9 +817,15 @@ function renderCmp() {
   const tbl = document.getElementById('cmpTable');
   tbl.querySelector('thead').innerHTML = `<tr>
     <th style="min-width:60px">Match</th>
-    <th colspan="3"><span class="badge bg-success me-1">OCS</span>Hostname · Serial · MAC</th>
-    <th colspan="5"><span class="badge bg-primary me-1">CRM</span>Hostname · Usuario · Activo · Serial · MAC</th>
-    <th colspan="3"><span class="badge bg-warning text-dark me-1">ESET</span>Hostname · Serial · MAC</th>
+    <th>Hostname</th>
+    <th>Usuario CRM</th>
+    <th>Activo</th>
+    <th>CRM Serial</th>
+    <th>CRM MAC</th>
+    <th>OCS Serial</th>
+    <th>OCS MAC</th>
+    <th>ESET Serial</th>
+    <th>ESET MAC</th>
   </tr>`;
   let rows = '';
   for (const d of devs) {
@@ -827,18 +835,22 @@ function renderCmp() {
     const methodColors = { serial: 'bg-success', hostname: 'bg-info text-dark', mac: 'bg-primary', uuid: 'bg-secondary', none: 'bg-secondary' };
     const methodColor = methodColors[method] || 'bg-secondary';
     const fmtMac = macs => macs ? (Array.isArray(macs) ? macs.join(', ') : macs) : '-';
+    const hostname = d.crm.hostname || d.ocs.hostname || d.eset.hostname || '-';
+    const sources = [];
+    if (d.crm.present) sources.push('CRM');
+    if (d.ocs.present) sources.push('OCS');
+    if (d.eset.present) sources.push('ESET');
+    const sourceBadge = '<span class="badge bg-secondary ms-1" style="font-size:0.55rem;vertical-align:middle">' + sources.join('·') + '</span>';
     rows += `<tr class="${rowClass}"><td><span class="badge ${methodColor} badge-method">${method}</span></td>
-      <td class="text-success">${d.ocs.present ? (d.ocs.hostname || '-') : '<span class="text-muted">-</span>'}</td>
-      <td class="small">${d.ocs.present ? (d.ocs.serialNumber || '-') : ''}</td>
-      <td class="small">${d.ocs.present ? fmtMac(d.ocs.macAddress) : ''}</td>
-      <td class="text-primary">${d.crm.present ? (d.crm.hostname || '-') : '<span class="text-muted">-</span>'}</td>
-      <td class="small">${d.crm.present ? (d.crm.contactName || '-') : ''}</td>
-      <td class="small">${d.crm.present ? (d.crm.usuarioActivo ? '<span class="badge bg-success" style="font-size:0.6rem">SI</span>' : '<span class="badge bg-danger" style="font-size:0.6rem">NO</span>') : ''}</td>
-      <td class="small">${d.crm.present ? (d.crm.serialNumber || '-') : ''}</td>
-      <td class="small">${d.crm.present ? fmtMac(d.crm.macAddress) : ''}</td>
-      <td class="text-warning">${d.eset.present ? (d.eset.hostname || '-') : '<span class="text-muted">-</span>'}</td>
-      <td class="small">${d.eset.present ? (d.eset.serialNumber || '-') : ''}</td>
-      <td class="small">${d.eset.present ? fmtMac(d.eset.macAddress) : ''}</td>
+      <td><strong>${hostname}</strong>${sourceBadge}</td>
+      <td class="small">${d.crm.present ? (d.crm.contactName || '-') : '<span class="text-muted">-</span>'}</td>
+      <td class="small">${d.crm.present ? (d.crm.usuarioActivo ? '<span class="badge bg-success" style="font-size:0.6rem">SI</span>' : '<span class="badge bg-danger" style="font-size:0.6rem">NO</span>') : '<span class="text-muted">-</span>'}</td>
+      <td class="small">${d.crm.present ? (d.crm.serialNumber || '-') : '<span class="text-muted">-</span>'}</td>
+      <td class="small" style="font-size:0.65rem">${d.crm.present ? fmtMac(d.crm.macAddress) : '<span class="text-muted">-</span>'}</td>
+      <td class="small">${d.ocs.present ? (d.ocs.serialNumber || '-') : '<span class="text-muted">-</span>'}</td>
+      <td class="small" style="font-size:0.65rem">${d.ocs.present ? fmtMac(d.ocs.macAddress) : '<span class="text-muted">-</span>'}</td>
+      <td class="small">${d.eset.present ? (d.eset.serialNumber || '-') : '<span class="text-muted">-</span>'}</td>
+      <td class="small" style="font-size:0.65rem">${d.eset.present ? fmtMac(d.eset.macAddress) : '<span class="text-muted">-</span>'}</td>
     </tr>`;
   }
   tbl.querySelector('tbody').innerHTML = rows;
