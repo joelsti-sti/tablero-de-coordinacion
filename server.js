@@ -24,7 +24,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
 const clientes = JSON.parse(fs.readFileSync(path.join(__dirname, 'clientes.json'), 'utf-8'));
 
@@ -36,6 +35,8 @@ app.get('/', (req, res) => {
   html = html.replace('__VTIGER_URL__', process.env.VTIGER_URL || '');
   res.send(html);
 });
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ============================================================
 // CRM/OCS/ESET Comparison
