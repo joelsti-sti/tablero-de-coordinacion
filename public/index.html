@@ -1096,10 +1096,10 @@ function renderKpi(data) {
   if (mantPend > 0) {
     html += `<div class="kpi-section"><h4>Mantenimientos Pendientes (${mantPend})</h4><p class="text-muted">FS del mes sin ticket ni tarea asociada</p><div class="row g-3">`;
     for (const m of data.mantenimientos_pendientes.presenciales) {
-      html += `<div class="col-md-6"><div class="card border-start border-danger border-4 p-3 h-100"><div class="d-flex justify-content-between"><strong>${m.cliente}</strong><span class="badge bg-danger">Presencial</span></div><small class="text-muted">${m.contract_no} | ${m.fecha ? new Date(m.fecha+'T12:00:00').toLocaleDateString() : ''} | ${m.tecnico}</small><div class="mt-1"><span class="badge bg-warning text-dark">${m.motivo}</span></div></div></div>`;
+      html += `<div class="col-md-6"><div class="card border-start border-danger border-4 p-3 h-100"><div class="d-flex justify-content-between"><strong>${m.cliente}</strong><span class="badge bg-danger">Presencial</span></div><small class="text-muted">${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=ServiceContracts&view=Detail&record=${m.fs_id}" target="_blank">${m.contract_no}</a>` : m.contract_no} | ${m.fecha ? new Date(m.fecha+'T12:00:00').toLocaleDateString() : ''} | ${m.tecnico}</small><div class="mt-1"><span class="badge bg-warning text-dark">${m.motivo}</span></div></div></div>`;
     }
     for (const m of data.mantenimientos_pendientes.remotos) {
-      html += `<div class="col-md-6"><div class="card border-start border-warning border-4 p-3 h-100"><div class="d-flex justify-content-between"><strong>${m.cliente}</strong><span class="badge bg-warning text-dark">Remoto</span></div><small class="text-muted">${m.contract_no} | ${m.fecha ? new Date(m.fecha+'T12:00:00').toLocaleDateString() : ''} | ${m.tecnico}</small><div class="mt-1"><span class="badge bg-warning text-dark">${m.motivo}</span></div></div></div>`;
+      html += `<div class="col-md-6"><div class="card border-start border-warning border-4 p-3 h-100"><div class="d-flex justify-content-between"><strong>${m.cliente}</strong><span class="badge bg-warning text-dark">Remoto</span></div><small class="text-muted">${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=ServiceContracts&view=Detail&record=${m.fs_id}" target="_blank">${m.contract_no}</a>` : m.contract_no} | ${m.fecha ? new Date(m.fecha+'T12:00:00').toLocaleDateString() : ''} | ${m.tecnico}</small><div class="mt-1"><span class="badge bg-warning text-dark">${m.motivo}</span></div></div></div>`;
     }
     html += `</div></div>`;
   } else {
@@ -1110,19 +1110,19 @@ function renderKpi(data) {
   html += `<div class="kpi-section"><h4>Incidencias Abiertas</h4><p class="text-muted">Total: ${data.kpi_tickets.totales_abiertos} tickets abiertos</p><div class="row g-3">`;
   if (data.kpi_tickets.urgentes_mas_24h.cantidad > 0) {
     html += `<div class="col-md-4"><div class="card border-danger p-3"><h6 class="text-danger">Urgentes >24hs (${data.kpi_tickets.urgentes_mas_24h.cantidad})</h6><ul class="list-unstyled mb-0" style="font-size:0.85rem;">`;
-    for (const t of data.kpi_tickets.urgentes_mas_24h.detalle.slice(0, 10)) html += `<li>${t.ticket_no} - ${t.cliente} (${t.dias_abierto}d)</li>`;
+    for (const t of data.kpi_tickets.urgentes_mas_24h.detalle.slice(0, 10)) html += `<li>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=HelpDesk&view=Detail&record=${t.ticketid}" target="_blank">${t.ticket_no}</a>` : t.ticket_no} - ${t.cliente} (${t.dias_abierto}d)</li>`;
     if (data.kpi_tickets.urgentes_mas_24h.detalle.length > 10) html += `<li class="text-muted">... y ${data.kpi_tickets.urgentes_mas_24h.detalle.length - 10} mas</li>`;
     html += `</ul></div></div>`;
   }
   if (data.kpi_tickets.alta_mas_7d.cantidad > 0) {
     html += `<div class="col-md-4"><div class="card border-warning p-3"><h6 class="text-warning">Alta >7dias (${data.kpi_tickets.alta_mas_7d.cantidad})</h6><ul class="list-unstyled mb-0" style="font-size:0.85rem;">`;
-    for (const t of data.kpi_tickets.alta_mas_7d.detalle.slice(0, 10)) html += `<li>${t.ticket_no} - ${t.cliente} (${t.dias_abierto}d)</li>`;
+    for (const t of data.kpi_tickets.alta_mas_7d.detalle.slice(0, 10)) html += `<li>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=HelpDesk&view=Detail&record=${t.ticketid}" target="_blank">${t.ticket_no}</a>` : t.ticket_no} - ${t.cliente} (${t.dias_abierto}d)</li>`;
     if (data.kpi_tickets.alta_mas_7d.detalle.length > 10) html += `<li class="text-muted">... y ${data.kpi_tickets.alta_mas_7d.detalle.length - 10} mas</li>`;
     html += `</ul></div></div>`;
   }
   if (data.kpi_tickets.baja_mas_30d.cantidad > 0) {
     html += `<div class="col-md-4"><div class="card border-secondary p-3"><h6 class="text-secondary">Baja >30dias (${data.kpi_tickets.baja_mas_30d.cantidad})</h6><ul class="list-unstyled mb-0" style="font-size:0.85rem;">`;
-    for (const t of data.kpi_tickets.baja_mas_30d.detalle.slice(0, 10)) html += `<li>${t.ticket_no} - ${t.cliente} (${t.dias_abierto}d)</li>`;
+    for (const t of data.kpi_tickets.baja_mas_30d.detalle.slice(0, 10)) html += `<li>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=HelpDesk&view=Detail&record=${t.ticketid}" target="_blank">${t.ticket_no}</a>` : t.ticket_no} - ${t.cliente} (${t.dias_abierto}d)</li>`;
     if (data.kpi_tickets.baja_mas_30d.detalle.length > 10) html += `<li class="text-muted">... y ${data.kpi_tickets.baja_mas_30d.detalle.length - 10} mas</li>`;
     html += `</ul></div></div>`;
   }
@@ -1138,12 +1138,12 @@ function renderKpi(data) {
     html += `<div class="kpi-section"><h4>Registros Cerrados sin Solucion</h4><div class="row g-3">`;
     if (tareasPend > 0) {
       html += `<div class="col-md-6"><div class="card p-3"><h6 class="text-danger">Tareas sin solucion (${tareasPend})</h6><div style="max-height:200px;overflow-y:auto;font-size:0.85rem;"><table class="table table-sm mb-0"><thead><tr><th>Tarea</th><th>Tecnico</th><th>Proyecto</th></tr></thead><tbody>`;
-      for (const t of data.tareas_sin_solucion) html += `<tr><td>${t.projecttask_no || ''}</td><td>${t.assigned_user || '-'}</td><td>${t.projectname || '-'}</td></tr>`;
+      for (const t of data.tareas_sin_solucion) html += `<tr><td>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=ProjectTask&view=Detail&record=${t.projecttaskid}" target="_blank">${t.projecttask_no}</a>` : (t.projecttask_no || '')}</td><td>${t.assigned_user || '-'}</td><td>${t.projectname || '-'}</td></tr>`;
       html += `</tbody></table></div></div></div>`;
     }
     if (ticketsPend > 0) {
       html += `<div class="col-md-6"><div class="card p-3"><h6 class="text-danger">Tickets sin solucion (${ticketsPend})</h6><div style="max-height:200px;overflow-y:auto;font-size:0.85rem;"><table class="table table-sm mb-0"><thead><tr><th>Ticket</th><th>Tecnico</th><th>Cliente</th></tr></thead><tbody>`;
-      for (const t of data.tickets_sin_solucion) html += `<tr><td>${t.ticket_no || ''}</td><td>${t.assigned_user || '-'}</td><td>${t.cliente || '-'}</td></tr>`;
+      for (const t of data.tickets_sin_solucion) html += `<tr><td>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=HelpDesk&view=Detail&record=${t.ticketid}" target="_blank">${t.ticket_no}</a>` : (t.ticket_no || '')}</td><td>${t.assigned_user || '-'}</td><td>${t.cliente || '-'}</td></tr>`;
       html += `</tbody></table></div></div></div>`;
     }
     html += `</div></div>`;
@@ -1154,7 +1154,7 @@ function renderKpi(data) {
     html += `<div class="kpi-section"><h4>Proximos Mantenimientos Agendados (${data.proximos_mantenimientos.length})</h4><div class="table-responsive"><table class="table kpi-table table-sm"><thead><tr><th>Fecha</th><th>Cliente</th><th>FS</th><th>Modalidad</th><th>Tecnico</th></tr></thead><tbody>`;
     for (const m of data.proximos_mantenimientos.slice(0, 20)) {
       const fecha = m.fecha ? new Date(m.fecha + 'T12:00:00').toLocaleDateString() : '-';
-      html += `<tr><td>${fecha}</td><td>${m.cliente || m.subject}</td><td>${m.contract_no}</td><td><span class="badge ${m.modalidad === 'Presencial' ? 'bg-primary' : 'bg-secondary'}">${m.modalidad}</span></td><td>${m.assigned_user || '-'}</td></tr>`;
+      html += `<tr><td>${fecha}</td><td>${m.cliente || m.subject}</td><td>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=ServiceContracts&view=Detail&record=${m.servicecontractsid}" target="_blank">${m.contract_no}</a>` : m.contract_no}</td><td><span class="badge ${m.modalidad === 'Presencial' ? 'bg-primary' : 'bg-secondary'}">${m.modalidad}</span></td><td>${m.assigned_user || '-'}</td></tr>`;
     }
     html += `</tbody></table></div></div>`;
   }

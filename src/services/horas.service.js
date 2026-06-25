@@ -756,21 +756,21 @@ async function getKpiMensual(year, month) {
       urgentes_mas_24h: {
         cantidad: urgentes24h.length,
         detalle: urgentes24h.map(t => ({
-          ticket_no: t.ticket_no, title: t.title, cliente: t.cliente,
+          ticketid: t.ticketid, ticket_no: t.ticket_no, title: t.title, cliente: t.cliente,
           asignado: t.assigned_user, dias_abierto: t.dias_abierto
         }))
       },
       alta_mas_7d: {
         cantidad: alta7d.length,
         detalle: alta7d.map(t => ({
-          ticket_no: t.ticket_no, title: t.title, cliente: t.cliente,
+          ticketid: t.ticketid, ticket_no: t.ticket_no, title: t.title, cliente: t.cliente,
           asignado: t.assigned_user, dias_abierto: t.dias_abierto
         }))
       },
       baja_mas_30d: {
         cantidad: baja30d.length,
         detalle: baja30d.map(t => ({
-          ticket_no: t.ticket_no, title: t.title, cliente: t.cliente,
+          ticketid: t.ticketid, ticket_no: t.ticket_no, title: t.title, cliente: t.cliente,
           asignado: t.assigned_user, dias_abierto: t.dias_abierto
         }))
       }
