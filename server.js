@@ -31,10 +31,10 @@ const clientes = JSON.parse(fs.readFileSync(path.join(__dirname, 'clientes.json'
 // ============================================================
 // UI
 // ============================================================
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-
-app.get('/api/config', (req, res) => {
-  res.json({ vtigerUrl: process.env.VTIGER_URL || '' });
+app.get('/', (req, res) => {
+  let html = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
+  html = html.replace('__VTIGER_URL__', process.env.VTIGER_URL || '');
+  res.send(html);
 });
 
 // ============================================================

@@ -359,7 +359,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
 
 <script>
 const API = '';
-let vtigerUrl = '';
+let vtigerUrl = (() => { const v = '__VTIGER_URL__'; return v.startsWith('__') ? '' : v; })();
 const autoRefreshInterval = 180000;
 let refreshTimer = null;
 
@@ -411,13 +411,7 @@ document.addEventListener('click', function(e) {
 // ============================================================
 // INIT
 // ============================================================
-async function init() {
-  try {
-    const r = await fetch(`${API}/api/config`);
-    const cfg = await r.json();
-    vtigerUrl = cfg.vtigerUrl || '';
-  } catch(e) {}
-
+function init() {
   const today = new Date().toISOString().split('T')[0];
   const todayMonth = new Date().toISOString().slice(0, 7);
   document.getElementById('globalDate').value = today;
