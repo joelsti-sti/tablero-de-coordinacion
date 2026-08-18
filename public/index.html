@@ -169,9 +169,10 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
     <div class="sidebar-divider"></div>
     <div class="nav-item" data-tab="comparacion"><span class="icon">🔍</span><span class="label">CRM / OCS / ESET</span></div>
     <div class="nav-item" data-tab="ocs"><span class="icon">🖥️</span><span class="label">Inventario OCS</span></div>
+    <div class="nav-item" data-tab="crm-inventory"><span class="icon">📋</span><span class="label">Inventario CRM</span></div>
+    <div class="nav-item" data-tab="eset-inventory"><span class="icon">🛡️</span><span class="label">Inventario ESET</span></div>
     <div class="sidebar-divider"></div>
-    <div class="nav-item" data-tab="kpi"><span class="icon">📊</span><span class="label">KPI Mensual</span></div>
-    <div class="nav-item" data-tab="sinasociar"><span class="icon">⚠️</span><span class="label">Sin Asociar</span></div>
+    <div class="nav-item" data-tab="fssinasociar"><span class="icon">📋</span><span class="label">FS Sin Tickets</span></div>
   </div>
   <div class="sidebar-footer">v2.0 &middot; STI</div>
 </div>
@@ -241,11 +242,13 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
         <div class="panel-header">
           <h5>Comparación CRM / OCS / ESET</h5>
           <span id="cmpStatus" class="text-muted small"></span>
+          <span id="cmpAutoRefresh" class="badge bg-light text-dark ms-1 fw-normal" style="font-size:0.65rem">⏱ caché: se actualiza al comparar</span>
         </div>
         <div class="row mb-3 g-2">
           <div class="col-auto"><select id="cmpCliente" class="form-select form-select-sm" style="min-width:260px"><option>Seleccionar cliente...</option></select></div>
           <div class="col-auto"><button class="btn btn-primary btn-sm" id="btnComparar">Comparar</button></div>
           <div class="col-auto"><button class="btn btn-outline-secondary btn-sm" id="btnReloadOCS">Recargar Caché OCS</button></div>
+          <div class="col-auto"><button class="btn btn-outline-info btn-sm" id="btnRefreshClientes" title="Refrescar lista de clientes desde el CRM">↻ Refrescar clientes</button></div>
           <div class="col-auto"><select id="cmpFiltroActivo" class="form-select form-select-sm" onchange="renderCmp()"><option value="">CRM: Todos</option><option value="si">CRM: Activo</option><option value="no">CRM: Inactivo</option></select></div>
         </div>
         <div class="row g-2 mb-3" id="cmpStats"></div>
@@ -268,7 +271,47 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
         </div>
         <div id="ocsError"></div>
         <div class="row g-2 mb-3" id="ocsStats"></div>
+        <div class="table-responsive mb-3"><table class="table table-sm table-hover" id="ocsContractsTable"><thead class="table-dark"></thead><tbody></tbody></table></div>
         <div class="table-responsive"><table class="table table-sm table-hover" id="ocsTable"><thead class="table-dark"></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- TAB: CRM INVENTORY -->
+    <div class="tab-pane" id="tab-crm-inventory">
+      <div class="panel">
+        <div class="panel-header">
+          <h5>Inventario CRM (Todos los clientes)</h5>
+          <span class="badge bg-secondary" id="crmInvCount"></span>
+        </div>
+        <div class="row mb-2 g-2">
+          <div class="col-auto"><select id="crmInvCliente" class="form-select form-select-sm" onchange="renderCrmInventory()"><option value="TODOS">Todos los clientes</option></select></div>
+          <div class="col"><input type="text" id="crmInvSearch" class="form-control form-control-sm" placeholder="Buscar por hostname, serial, usuario..."></div>
+          <div class="col-auto"><select id="crmInvActivo" class="form-select form-select-sm" onchange="renderCrmInventory()"><option value="">Todos</option><option value="si">Activo (sí)</option><option value="no">Inactivo (no)</option></select></div>
+          <div class="col-auto"><select id="crmInvEquipo" class="form-select form-select-sm" onchange="renderCrmInventory()"><option value="">Todos los equipos</option><option value="1">Equipo 1</option><option value="2">Equipo 2</option><option value="3">Equipo 3</option></select></div>
+        </div>
+        <div class="row g-2 mb-3" id="crmInvStats"></div>
+        <div class="table-responsive mb-3"><table class="table table-sm table-hover" id="crmInvContractsTable"><thead class="table-dark"></thead><tbody></tbody></table></div>
+        <div class="table-responsive"><table class="table table-sm table-hover" id="crmInvTable"><thead class="table-dark"></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- TAB: ESET INVENTORY -->
+    <div class="tab-pane" id="tab-eset-inventory">
+      <div class="panel">
+        <div class="panel-header">
+          <h5>Inventario ESET</h5>
+          <span class="badge bg-secondary" id="esetInvCount"></span>
+          <span class="badge bg-light text-dark ms-1 fw-normal" style="font-size:0.65rem">💳 licencias desde CRM (cf_1269/1271/1273)</span>
+        </div>
+        <div class="row mb-2 g-2">
+          <div class="col-auto"><select id="esetInvCliente" class="form-select form-select-sm" style="min-width:260px" onchange="loadEsetClientInventory()"><option value="">Seleccionar cliente...</option></select></div>
+          <div class="col-auto"><button class="btn btn-primary btn-sm" onclick="loadEsetClientInventory()">Consultar</button></div>
+          <div class="col"><input type="text" id="esetInvSearch" class="form-control form-control-sm" placeholder="Buscar por hostname, serial..."></div>
+          <div class="col-auto"><button class="btn btn-outline-warning btn-sm" onclick="loadEsetLicencias()">🔄 Recargar licencias</button></div>
+        </div>
+        <div class="row g-2 mb-3" id="esetInvStats"></div>
+        <div class="table-responsive mb-3"><table class="table table-sm table-hover" id="esetLicTable"><thead class="table-dark"></thead><tbody></tbody></table></div>
+        <div class="table-responsive"><table class="table table-sm table-hover" id="esetInvTable"><thead class="table-dark"></thead><tbody></tbody></table></div>
       </div>
     </div>
 
@@ -286,7 +329,14 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
         <div class="fs-table">
           <table class="table table-hover mb-0">
             <thead><tr>
-              <th>Fecha</th><th>Tarea</th><th>N°</th><th>Proyecto</th><th>N° Proyecto</th><th>Estado</th>
+              <th>Fecha</th><th>Tarea</th><th>N°</th><th>Proyecto</th><th>N° Proyecto</th>
+              <th style="position:relative;">Cliente<button class="btn btn-sm btn-outline-secondary ms-1 py-0" onclick="toggleFilterDropdown('tareasCliFilterDropdown')" style="font-size:0.65rem;">▼</button>
+                <div id="tareasCliFilterDropdown" class="filter-dropdown">
+                  <label class="filter-dropdown-all"><input type="checkbox" onchange="toggleAllTareasCli(this)" checked> Todos</label>
+                  <div id="tareasCliFilterList"></div>
+                </div>
+              </th>
+              <th>Estado</th>
               <th style="position:relative;">Técnico<button class="btn btn-sm btn-outline-secondary ms-1 py-0" onclick="toggleFilterDropdown('tareasTecFilterDropdown')" style="font-size:0.65rem;">▼</button>
                 <div id="tareasTecFilterDropdown" class="filter-dropdown">
                   <label class="filter-dropdown-all"><input type="checkbox" onchange="toggleAllTareasTec(this)" checked> Todos</label>
@@ -294,7 +344,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
                 </div>
               </th>
             </tr></thead>
-            <tbody id="tareasTableBody"><tr><td colspan="7" class="text-center text-muted">Seleccione un mes y haga clic en Consultar</td></tr></tbody>
+            <tbody id="tareasTableBody"><tr><td colspan="9" class="text-center text-muted">Seleccione un mes y haga clic en Consultar</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -360,6 +410,58 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
       </div>
     </div>
 
+    <!-- TAB 10: FS SIN ASOCIAR (dedicado) -->
+    <div class="tab-pane" id="tab-fssinasociar">
+      <div class="panel">
+        <div class="panel-header">
+          <h5>Formularios sin Tickets/Tareas Asociados</h5>
+          <h5 class="mb-0 text-warning" id="totalFsSinAsociarFullCount">0</h5>
+        </div>
+        <div class="row mb-3">
+          <div class="col-auto"><input type="month" id="fsSinAsociarFullMonth" class="form-control form-control-sm"></div>
+          <div class="col-auto"><button class="btn btn-primary btn-sm" onclick="fetchFsSinAsociarFull()">Consultar</button></div>
+        </div>
+        <div class="fs-table">
+          <table class="table table-hover mb-0">
+            <thead><tr>
+              <th>Fecha</th><th>FS</th>
+              <th style="position:relative;">Cliente<button class="btn btn-sm btn-outline-secondary ms-1 py-0" onclick="toggleFilterDropdown('fsSinAsociarFullCliFilterDropdown')" style="font-size:0.65rem;">▼</button>
+                <div id="fsSinAsociarFullCliFilterDropdown" class="filter-dropdown">
+                  <label class="filter-dropdown-all"><input type="checkbox" onchange="toggleAllFsSinAsociarFullCli(this)" checked> Todos</label>
+                  <div id="fsSinAsociarFullCliFilterList"></div>
+                </div>
+              </th>
+              <th>Número</th><th class="text-center">Inicio</th><th class="text-center">Fin</th><th class="text-center">Horas</th>
+              <th style="position:relative;">Técnico<button class="btn btn-sm btn-outline-secondary ms-1 py-0" onclick="toggleFilterDropdown('fsSinAsociarFullTecFilterDropdown')" style="font-size:0.65rem;">▼</button>
+                <div id="fsSinAsociarFullTecFilterDropdown" class="filter-dropdown">
+                  <label class="filter-dropdown-all"><input type="checkbox" onchange="toggleAllFsSinAsociarFullTec(this)" checked> Todos</label>
+                  <div id="fsSinAsociarFullTecFilterList"></div>
+                </div>
+              </th>
+            </tr></thead>
+            <tbody id="fsSinAsociarFullTableBody"><tr><td colspan="8" class="text-center text-muted">Seleccione un mes y haga clic en Consultar</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 11: TÉCNICOS CON < 6 HS -->
+    <div class="tab-pane" id="tab-tecnicos">
+      <div class="panel">
+        <div class="panel-header">
+          <h5>Técnicos con &lt; 6 Horas por Día (Mensual)</h5>
+          <div class="d-flex gap-2 align-items-center">
+            <input type="month" id="tecnicosMonth" class="form-control form-control-sm" style="width:160px">
+            <select id="tecnicosFiltro" class="form-select form-select-sm" style="width:200px">
+              <option value="">Todos los técnicos</option>
+            </select>
+            <span id="tecnicosTotalCount" class="badge bg-light text-dark"></span>
+          </div>
+        </div>
+        <div id="tecnicosContent"><div class="text-center py-5 text-muted">Seleccioná un mes</div></div>
+      </div>
+    </div>
+
   </div>
 
   <div class="text-center mt-4 pb-3">
@@ -389,9 +491,15 @@ let currentTicketsData = [];
 let currentNegativosData = [];
 let currentSinAsociarMensualData = [];
 let tareasTecFilter = null;
+let tareasCliFilter = null;
 let ticketsTecFilter = null;
 let sinAsociarMensualTecFilter = null;
 let sinAsociarMensualCliFilter = null;
+let currentFsSinAsociarFullData = [];
+let fsSinAsociarFullTecFilter = null;
+let fsSinAsociarFullCliFilter = null;
+let currentTecnicosMenor6Data = [];
+let tecnicosMenor6Filtro = null;
 
 // ============================================================
 // HELPERS
@@ -431,6 +539,10 @@ function init() {
   document.getElementById('kpiMes').value = todayMonth;
   document.getElementById('tareasMonth').value = todayMonth;
   document.getElementById('ticketsMonth').value = todayMonth;
+  const fsFullMonth = document.getElementById('fsSinAsociarFullMonth');
+  if (fsFullMonth) fsFullMonth.value = todayMonth;
+  const tecnicosMonth = document.getElementById('tecnicosMonth');
+  if (tecnicosMonth) tecnicosMonth.value = todayMonth;
 
   document.getElementById('clock').textContent = new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'});
   setInterval(() => {
@@ -460,8 +572,10 @@ function init() {
 const TAB_TITLES = {
   horas: 'Horas del Día', detalle: 'Detalle de Formularios', mensual: 'Vista Mensual',
   comparacion: 'Comparación CRM / OCS / ESET', ocs: 'Inventario OCS',
+  'crm-inventory': 'Inventario CRM', 'eset-inventory': 'Inventario ESET',
   tareas: 'Tareas Pendientes', tickets: 'Tickets Pendientes',
-  kpi: 'KPI Mensual', sinasociar: 'FS Sin Asociar'
+  kpi: 'KPI Mensual', sinasociar: 'FS Sin Asociar',
+  fssinasociar: 'FS Sin Tickets', tecnicos: 'Técnicos Menor 6h'
 };
 
 function setupTabs() {
@@ -477,7 +591,18 @@ function setupTabs() {
       else if (tab === 'detalle') loadDetalle();
       else if (tab === 'mensual') loadMensual();
       else if (tab === 'ocs') loadOcsComputers();
+      else if (tab === 'crm-inventory') loadCrmInventory();
+      else if (tab === 'eset-inventory') loadEsetInventory();
       else if (tab === 'sinasociar') loadSinAsociar();
+      else if (tab === 'tecnicos') {
+        const el = document.getElementById('tecnicosMonth');
+        if (el && !el.value) el.value = new Date().toISOString().slice(0, 7);
+        loadTecnicosMenor6();
+      }
+      else if (tab === 'fssinasociar') {
+        const el = document.getElementById('fsSinAsociarFullMonth');
+        if (el && !el.value) el.value = new Date().toISOString().slice(0, 7);
+      }
     });
   });
 
@@ -748,23 +873,52 @@ async function loadClientesCmp() {
     sel.innerHTML = '<option value="">Seleccionar cliente...</option>';
     cls.forEach((c, i) => {
       const opt = document.createElement('option');
-      opt.value = i; opt.textContent = `${c.empresa} [OCS:${c.tag_ocs}]${c.has_eset ? ' [ESET]' : ''}`;
+      opt.value = i;
+      const parts = [c.empresa];
+      if (c.tag_ocs) parts.push(`[OCS:${c.tag_ocs}]`);
+      else if (c.fromCrm) parts.push('[CRM]');
+      if (c.has_eset) parts.push('[ESET]');
+      opt.textContent = parts.join(' ');
       sel.appendChild(opt);
     });
   } catch(e) {}
 }
 
+document.getElementById('btnRefreshClientes').addEventListener('click', async function() {
+  const btn = this;
+  btn.disabled = true; btn.textContent = 'Actualizando...';
+  try {
+    await fetch(`${API}/api/clientes/refresh`, { method: 'POST' });
+    await loadClientesCmp();
+    btn.textContent = '¡Listo!';
+    setTimeout(() => { btn.textContent = '↻ Refrescar clientes'; }, 1500);
+  } catch(e) {
+    btn.textContent = 'Error';
+    setTimeout(() => { btn.textContent = '↻ Refrescar clientes'; }, 1500);
+  }
+  btn.disabled = false;
+});
+
 document.getElementById('btnComparar').addEventListener('click', async () => {
   const idx = document.getElementById('cmpCliente').value;
   if (!idx) return;
   const btn = document.getElementById('btnComparar');
-  btn.disabled = true; btn.textContent = 'Comparando...';
-  document.getElementById('cmpStatus').textContent = 'Iniciando...';
+  btn.disabled = true; btn.textContent = 'Refrescando caché...';
+  const cmpStatus = document.getElementById('cmpStatus');
+  cmpStatus.textContent = 'Actualizando caché OCS...';
+  const progressPoll = setInterval(async () => {
+    try {
+      const sr = await fetch(`${API}/api/ocs-cache-status`);
+      const s = await sr.json();
+      cmpStatus.textContent = s.loading ? s.progress : 'Procesando comparación...';
+    } catch(e) {}
+  }, 1500);
   try {
     const r = await fetch(`${API}/api/compare/${idx}`, { method: 'POST' });
     cmpData = await r.json();
     renderCmp();
-  } catch(e) { document.getElementById('cmpStatus').textContent = 'Error: ' + e.message; }
+  } catch(e) { cmpStatus.textContent = 'Error: ' + e.message; }
+  clearInterval(progressPoll);
   btn.disabled = false; btn.textContent = 'Comparar';
 });
 
@@ -788,12 +942,24 @@ function renderCmp() {
   let html = ''; let est = 0, fis = 0, vir = 0;
   (cmpData.contracts || []).forEach(c => { est += parseInt(c.estacionesTrabajo||0); fis += parseInt(c.servidoresFisicos||0); vir += parseInt(c.servidoresVirtuales||0); });
   if (cmpData.contracts?.length) {
+    const totalContrato = est + fis + vir;
     html += `<div class="col-auto"><div class="stat-card border-info"><div class="num text-info">${est}</div><div class="label">Estaciones contrato</div></div></div>`;
     html += `<div class="col-auto"><div class="stat-card border-info"><div class="num text-info">${fis}</div><div class="label">Serv. Físicos</div></div></div>`;
     html += `<div class="col-auto"><div class="stat-card border-info"><div class="num text-info">${vir}</div><div class="label">Serv. Virtuales</div></div></div>`;
+    html += `<div class="col-auto"><div class="stat-card" style="border-left:3px solid #0dcaf0"><div class="num text-info">${totalContrato}</div><div class="label">Total Contrato</div></div></div>`;
+    const lic = cmpData.contracts.map(c => parseInt(c.cantidadLicencias||0)).reduce((s,v)=>s+v,0);
+    const ven = cmpData.contracts.map(c => c.fechaVencimiento).filter(Boolean)[0];
+    const ant = cmpData.contracts.map(c => c.antivirus).filter(Boolean)[0];
+    if (lic || ven || ant) {
+      const venBadge = ven ? (new Date(ven) < new Date() ? '<span class="badge bg-danger" style="font-size:0.7rem">VENCIDO</span>' : '<span class="badge bg-success" style="font-size:0.7rem">Vigente</span>') : '';
+      html += `<div class="col-auto"><div class="stat-card" style="border-left:3px solid #ffc107"><div class="num" style="font-size:1.1rem">${ant || '-'}</div><div class="label">Antivirus ${lic ? `· ${lic} lic.` : ''}</div></div></div>`;
+      if (ven) html += `<div class="col-auto"><div class="stat-card" style="border-left:3px solid #ffc107"><div class="num" style="font-size:1.1rem">${ven} ${venBadge}</div><div class="label">Vencimiento licencias</div></div></div>`;
+    }
   }
   html += `<div class="col-auto"><div class="stat-card border-primary" style="border-left:3px solid #0d6efd"><div class="num text-primary">${cmpData.totalCRM}</div><div class="label">CRM</div></div></div>`;
-  html += `<div class="col-auto"><div class="stat-card border-success" style="border-left:3px solid #198754"><div class="num text-success">${cmpData.totalOCS}</div><div class="label">OCS Inventory</div></div></div>`;
+  html += `<div class="col-auto"><div class="stat-card" style="border-left:3px solid #20c997"><div class="num text-success">${cmpData.totalOCSterminals ?? cmpData.totalOCS}</div><div class="label">OCS Terminales</div></div></div>`;
+  html += `<div class="col-auto"><div class="stat-card" style="border-left:3px solid #6f42c1"><div class="num text-danger">${cmpData.totalOCSservers ?? 0}</div><div class="label">OCS Servidores</div></div></div>`;
+  html += `<div class="col-auto"><div class="stat-card border-success" style="border-left:3px solid #198754"><div class="num text-success">${cmpData.totalOCS}</div><div class="label">OCS Total</div></div></div>`;
   html += `<div class="col-auto"><div class="stat-card border-warning" style="border-left:3px solid #ffc107"><div class="num text-warning">${cmpData.totalESET}</div><div class="label">ESET Protect</div></div></div>`;
   document.getElementById('cmpStats').innerHTML = html;
   const s = cmpData.summary;
@@ -876,20 +1042,24 @@ async function loadOcsComputers() {
   if (search) params.set('search', search);
   if (tipo) params.set('tipo', tipo);
   try {
-    let [r, rs] = await Promise.all([
+    let [r, rs, cr] = await Promise.all([
       fetch(`${API}/api/ocs/computers?${params}`).then(r => r.json()),
-      fetch(`${API}/api/ocs/summary`).then(r => r.json())
+      fetch(`${API}/api/ocs/summary`).then(r => r.json()),
+      fetch(`${API}/api/contracts`).then(r => r.json())
     ]);
     ocsComputers = Array.isArray(r) ? r : [];
+    contractsData = Array.isArray(cr) ? cr : contractsData;
     document.getElementById('ocsCount').textContent = `${ocsComputers.length} equipos`;
     if (!rs || rs.error) rs = { total: 0, virtuales: 0, workgroups: 0, sin_bios_serial: 0, sin_uuid: 0 };
+    const contractRows = (wg && wg !== 'TODOS') ? buildContractRows(wg) : [];
+    renderContractsTable('ocsContractsTable', contractRows);
     document.getElementById('ocsStats').innerHTML = `
       <div class="col-auto"><div class="stat-card"><div class="num text-primary">${rs.total}</div><div class="label">Total</div></div></div>
       <div class="col-auto"><div class="stat-card"><div class="num text-danger">${rs.virtuales}</div><div class="label">Virtuales</div></div></div>
       <div class="col-auto"><div class="stat-card"><div class="num text-success">${rs.total - rs.virtuales}</div><div class="label">Físicos</div></div></div>
       <div class="col-auto"><div class="stat-card"><div class="num text-info">${rs.workgroups}</div><div class="label">Clientes</div></div></div>
       <div class="col-auto"><div class="stat-card"><div class="num text-warning">${rs.sin_bios_serial}</div><div class="label">Sin Serial</div></div></div>
-      <div class="col-auto"><div class="stat-card"><div class="num text-warning">${rs.sin_uuid}</div><div class="label">Sin UUID</div></div></div>`;
+      <div class="col-auto"><div class="stat-card"><div class="num text-warning">${rs.sin_uuid}</div><div class="label">Sin UUID</div></div></div>` + contractStatsHtml(contractRows);
     const tbl = document.getElementById('ocsTable');
     if (!tbl) return;
     tbl.querySelector('thead').innerHTML = '<tr><th>Nombre</th><th>Cliente</th><th>SO</th><th>CPU</th><th>RAM</th><th>Disco</th><th>Tipo</th><th>IP</th><th>MAC</th><th>Serial</th><th>UUID</th><th>Usuario</th><th>Uptime</th><th>Último contacto</th></tr>';
@@ -933,22 +1103,45 @@ function toggleAllTareasTec(el) {
   onTareasTecFilterChange();
 }
 
+function populateTareasCliFilter() {
+  if (currentTareasData.length === 0) return;
+  const clis = [...new Set(currentTareasData.map(r => r.cliente).filter(Boolean))].sort();
+  const list = document.getElementById('tareasCliFilterList');
+  list.innerHTML = clis.map(c => `<label><input type="checkbox" value="${c.replace(/"/g, '&quot;')}" onchange="onTareasCliFilterChange()" checked> ${c}</label>`).join('');
+  tareasCliFilter = null;
+}
+
+function onTareasCliFilterChange() {
+  const checks = document.querySelectorAll('#tareasCliFilterList input[type=checkbox]');
+  const allChecked = [...checks].every(c => c.checked);
+  document.querySelector('#tareasCliFilterDropdown .filter-dropdown-all input').checked = allChecked;
+  const selected = [...checks].filter(c => c.checked).map(c => c.value);
+  tareasCliFilter = selected.length < checks.length ? new Set(selected) : null;
+  renderTareasTable(currentTareasData);
+}
+
+function toggleAllTareasCli(el) {
+  document.querySelectorAll('#tareasCliFilterList input[type=checkbox]').forEach(c => c.checked = el.checked);
+  onTareasCliFilterChange();
+}
+
 async function fetchTareasPendientes() {
   const monthInput = document.getElementById('tareasMonth');
   const monthValue = monthInput.value;
   if (!monthValue) return;
   const [year, month] = monthValue.split('-');
   const tbody = document.getElementById('tareasTableBody');
-  tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Cargando datos...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">Cargando datos...</td></tr>';
   try {
     const response = await fetch(`${API}/api/tareas-pendientes?year=${year}&month=${month}`);
     const data = await response.json();
     if (data.error) throw new Error(data.error);
     currentTareasData = data;
     populateTareasTecFilter();
+    populateTareasCliFilter();
     renderTareasTable(currentTareasData);
   } catch (error) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Error: ${error.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">Error: ${error.message}</td></tr>`;
   }
 }
 
@@ -957,10 +1150,11 @@ function renderTareasTable(data) {
   const filter = document.getElementById('filterInput').value.toLowerCase();
   const filtered = data.filter(r => {
     if (tareasTecFilter && !tareasTecFilter.has(r.assigned_user)) return false;
-    return (r.task_name + ' ' + r.projectname + ' ' + r.assigned_user).toLowerCase().includes(filter);
+    if (tareasCliFilter && !tareasCliFilter.has(r.cliente)) return false;
+    return (r.task_name + ' ' + r.projectname + ' ' + r.cliente + ' ' + r.assigned_user).toLowerCase().includes(filter);
   });
   document.getElementById('totalTareasCount').textContent = filtered.length;
-  if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-success">No hay tareas pendientes sin solución.</td></tr>'; return; }
+  if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="9" class="text-center text-success">No hay tareas pendientes sin solución.</td></tr>'; return; }
   tbody.innerHTML = filtered.map(row => {
     const fecha = row.created_date ? new Date(row.created_date).toLocaleDateString() : '-';
     const taskLink = vtigerUrl ? `${vtigerUrl}/index.php?module=ProjectTask&view=Detail&record=${row.projecttaskid}` : null;
@@ -969,6 +1163,7 @@ function renderTareasTable(data) {
       <td><small class="text-muted">${row.task_no || '-'}</small></td>
       <td>${row.projectname || '-'}</td>
       <td><small class="text-muted">${row.project_no || '-'}</small></td>
+      <td>${row.cliente || '-'}</td>
       <td><span class="badge bg-secondary">${row.status}</span></td>
       <td><small>${row.assigned_user || '-'}</small></td></tr>`;
   }).join('');
@@ -1040,6 +1235,99 @@ function renderTicketsTable(data) {
 }
 
 // ============================================================
+// FS SIN ASOCIAR (Tab dedicado)
+// ============================================================
+function populateFsSinAsociarFullTecFilter() {
+  if (currentFsSinAsociarFullData.length === 0) return;
+  const tecs = [...new Set(currentFsSinAsociarFullData.map(r => r.assigned_user).filter(Boolean))].sort();
+  const list = document.getElementById('fsSinAsociarFullTecFilterList');
+  list.innerHTML = tecs.map(t => `<label><input type="checkbox" value="${t.replace(/"/g, '&quot;')}" onchange="onFsSinAsociarFullTecFilterChange()" checked> ${t}</label>`).join('');
+  fsSinAsociarFullTecFilter = null;
+}
+
+function onFsSinAsociarFullTecFilterChange() {
+  const checks = document.querySelectorAll('#fsSinAsociarFullTecFilterList input[type=checkbox]');
+  const allChecked = [...checks].every(c => c.checked);
+  document.querySelector('#fsSinAsociarFullTecFilterDropdown .filter-dropdown-all input').checked = allChecked;
+  const selected = [...checks].filter(c => c.checked).map(c => c.value);
+  fsSinAsociarFullTecFilter = selected.length < checks.length ? new Set(selected) : null;
+  renderFsSinAsociarFullTable(currentFsSinAsociarFullData);
+}
+
+function toggleAllFsSinAsociarFullTec(el) {
+  document.querySelectorAll('#fsSinAsociarFullTecFilterList input[type=checkbox]').forEach(c => c.checked = el.checked);
+  onFsSinAsociarFullTecFilterChange();
+}
+
+function populateFsSinAsociarFullCliFilter() {
+  if (currentFsSinAsociarFullData.length === 0) return;
+  const clis = [...new Set(currentFsSinAsociarFullData.map(r => r.cliente).filter(Boolean))].sort();
+  const list = document.getElementById('fsSinAsociarFullCliFilterList');
+  list.innerHTML = clis.map(c => `<label><input type="checkbox" value="${c.replace(/"/g, '&quot;')}" onchange="onFsSinAsociarFullCliFilterChange()" checked> ${c}</label>`).join('');
+  fsSinAsociarFullCliFilter = null;
+}
+
+function onFsSinAsociarFullCliFilterChange() {
+  const checks = document.querySelectorAll('#fsSinAsociarFullCliFilterList input[type=checkbox]');
+  const allChecked = [...checks].every(c => c.checked);
+  document.querySelector('#fsSinAsociarFullCliFilterDropdown .filter-dropdown-all input').checked = allChecked;
+  const selected = [...checks].filter(c => c.checked).map(c => c.value);
+  fsSinAsociarFullCliFilter = selected.length < checks.length ? new Set(selected) : null;
+  renderFsSinAsociarFullTable(currentFsSinAsociarFullData);
+}
+
+function toggleAllFsSinAsociarFullCli(el) {
+  document.querySelectorAll('#fsSinAsociarFullCliFilterList input[type=checkbox]').forEach(c => c.checked = el.checked);
+  onFsSinAsociarFullCliFilterChange();
+}
+
+async function fetchFsSinAsociarFull() {
+  const monthInput = document.getElementById('fsSinAsociarFullMonth');
+  const monthValue = monthInput.value;
+  if (!monthValue) return;
+  const [year, month] = monthValue.split('-');
+  const tbody = document.getElementById('fsSinAsociarFullTableBody');
+  tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Cargando datos...</td></tr>';
+  try {
+    const response = await fetch(`${API}/api/fs-sin-asociar-full?year=${year}&month=${month}`);
+    const data = await response.json();
+    if (data.error) throw new Error(data.error);
+    currentFsSinAsociarFullData = data;
+    populateFsSinAsociarFullTecFilter();
+    populateFsSinAsociarFullCliFilter();
+    renderFsSinAsociarFullTable(currentFsSinAsociarFullData);
+  } catch (error) {
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">Error: ${error.message}</td></tr>`;
+  }
+}
+
+function renderFsSinAsociarFullTable(data) {
+  const tbody = document.getElementById('fsSinAsociarFullTableBody');
+  const filter = document.getElementById('filterInput').value.toLowerCase();
+  const filtered = data.filter(r => {
+    if (fsSinAsociarFullTecFilter && !fsSinAsociarFullTecFilter.has(r.assigned_user)) return false;
+    if (fsSinAsociarFullCliFilter && !fsSinAsociarFullCliFilter.has(r.cliente)) return false;
+    return (r.fs_name + ' ' + r.cliente + ' ' + r.assigned_user).toLowerCase().includes(filter);
+  });
+  document.getElementById('totalFsSinAsociarFullCount').textContent = filtered.length;
+  if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center text-success">Todos los FS tienen ticket o tarea asociada.</td></tr>'; return; }
+  tbody.innerHTML = filtered.map(row => {
+    const fecha = row.fs_fecha || '-';
+    const hours = parseFloat(row.horas || 0);
+    let badgeClass = hours >= 7 ? 'bg-success' : hours >= 5 ? 'bg-warning text-dark' : 'bg-danger';
+    const link = vtigerUrl ? `${vtigerUrl}/index.php?module=ServiceContracts&view=Detail&record=${row.fs_id}` : null;
+    return `<tr><td><small class="text-muted">${fecha}</small></td>
+      <td>${link ? `<a href="${link}" target="_blank" rel="noreferrer">${row.fs_numero || row.fs_name}</a>` : (row.fs_numero || row.fs_name)}</td>
+      <td>${row.cliente || '-'}</td>
+      <td><small class="text-muted">${row.fs_numero || '-'}</small></td>
+      <td class="text-center">${String(row.hora_inicio || '').substring(0,5)}</td>
+      <td class="text-center">${String(row.hora_fin || '').substring(0,5)}</td>
+      <td class="text-center"><span class="badge ${badgeClass}">${fmtHrs(hours)}</span></td>
+      <td><small>${row.assigned_user || '-'}</small></td></tr>`;
+  }).join('');
+}
+
+// ============================================================
 // KPI MENSUAL (DETALLADO)
 // ============================================================
 document.getElementById('btnCargarKPI').addEventListener('click', loadKpi);
@@ -1093,32 +1381,40 @@ function renderKpi(data) {
     <div class="col-md-2 col-6"><div class="kpi-card secondary"><div class="kpi-num">${totalPresencial}P / ${totalRemoto}R</div><div class="kpi-label">Presencial / Remoto</div></div></div>
     <div class="col-md-2 col-6"><div class="kpi-card ${totalAusencias > 0 ? 'warning' : 'success'}"><div class="kpi-num">${totalAusencias}</div><div class="kpi-label">Ausencias / Demoras</div></div></div>
     <div class="col-md-2 col-6"><div class="kpi-card success"><div class="kpi-num">${totalTareas}</div><div class="kpi-label">Tareas Completadas</div></div></div>
-    <div class="col-md-2 col-6"><div class="kpi-card success"><div class="kpi-num">${totalTickets}</div><div class="kpi-label">Tickets Resueltos</div></div></div>
+    <div class="col-md-2 col-6"><div class="kpi-card info"><div class="kpi-num">${tec.reduce((s, t) => s + t.tickets_creados, 0)}C / ${totalTickets}R</div><div class="kpi-label">Tickets Creados / Resueltos</div></div></div>
   </div></div>`;
 
   // KPI Indicators
+  const totalCreados = tec.reduce((s, t) => s + t.tickets_creados, 0);
+  const totalResueltos = tec.reduce((s, t) => s + t.tickets_resueltos, 0);
+  const pctResolucion = totalCreados > 0 ? Math.round((totalResueltos / totalCreados) * 100) : 0;
   html += `<div class="kpi-section"><h4>Indicadores de Gestion</h4><div class="row g-3">
+    <div class="col-md-3"><div class="card h-100 p-3"><div class="d-flex justify-content-between align-items-center"><div><small class="text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:0.5px;">Tickets Creados vs Resueltos</small><div class="fw-bold mt-1" style="font-size:1.3rem;">${totalCreados} / ${totalResueltos}</div><small class="text-muted">${pctResolucion}% resolucion</small></div><div>${estadoKPI(pctResolucion >= 80)}</div></div><div class="kpi-progress"><div class="kpi-progress-bar" style="width:${pctResolucion}%;${pctResolucion < 80 ? 'background:#f39c12' : ''}"></div></div></div></div>
     <div class="col-md-3"><div class="card h-100 p-3"><div class="d-flex justify-content-between align-items-center"><div><small class="text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:0.5px;">Cero Tickets Urgentes &gt;24hs</small><div class="fw-bold mt-1" style="font-size:1.3rem;">${data.kpi_tickets.urgentes_mas_24h.cantidad}</div></div><div>${estadoKPI(kpiUrgentes)}</div></div><div class="kpi-progress"><div class="kpi-progress-bar" style="width:${kpiUrgentes ? 100 : 0}%;${!kpiUrgentes ? 'background:#dc3545' : ''}"></div></div></div></div>
     <div class="col-md-3"><div class="card h-100 p-3"><div class="d-flex justify-content-between align-items-center"><div><small class="text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:0.5px;">Cero Tickets Alta &gt;7 dias</small><div class="fw-bold mt-1" style="font-size:1.3rem;">${data.kpi_tickets.alta_mas_7d.cantidad}</div></div><div>${estadoKPI(kpiAlta)}</div></div><div class="kpi-progress"><div class="kpi-progress-bar" style="width:${100 - Math.min(data.kpi_tickets.alta_mas_7d.cantidad * 5, 100)}%;${!kpiAlta ? 'background:#dc3545' : ''}"></div></div></div></div>
-    <div class="col-md-3"><div class="card h-100 p-3"><div class="d-flex justify-content-between align-items-center"><div><small class="text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:0.5px;">Cero Tickets Baja &gt;30 dias</small><div class="fw-bold mt-1" style="font-size:1.3rem;">${data.kpi_tickets.baja_mas_30d.cantidad}</div></div><div>${estadoKPI(kpiBaja)}</div></div><div class="kpi-progress"><div class="kpi-progress-bar" style="width:${100 - Math.min(data.kpi_tickets.baja_mas_30d.cantidad, 100)}%;${!kpiBaja ? 'background:#dc3545' : ''}"></div></div></div></div>
     <div class="col-md-3"><div class="card h-100 p-3"><div class="d-flex justify-content-between align-items-center"><div><small class="text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:0.5px;">Mantenimientos Sin Asociar</small><div class="fw-bold mt-1" style="font-size:1.3rem;">${mantPend}</div></div><div>${estadoKPI(mantPend === 0)}</div></div><div class="kpi-progress"><div class="kpi-progress-bar" style="width:${100 - Math.min(mantPend * 10, 100)}%;${mantPend > 0 ? 'background:#f39c12' : ''}"></div></div></div></div>
   </div></div>`;
 
   // Tecnicos table
   html += `<div class="kpi-section"><h4>Productividad por Tecnico</h4><div class="table-responsive"><table class="table kpi-table table-hover"><thead><tr>
-    <th>Tecnico</th><th class="text-center">Dias</th><th class="text-center">Horas</th><th class="text-center">FS</th><th class="text-center">Presencial</th><th class="text-center">Remoto</th><th class="text-center">Tareas</th><th class="text-center">Tickets</th><th class="text-center">Ausencias</th><th class="text-center">Demoras</th><th>Viaje</th>
+    <th>Tecnico</th><th class="text-center">Dias</th><th class="text-center">Horas</th><th class="text-center">Prom. Diario</th><th class="text-center">Prom. Sin Inc.</th><th class="text-center">FS</th><th class="text-center">P/R</th><th class="text-center">Tareas</th><th class="text-center">Tickets Creados</th><th class="text-center">Tickets Resueltos</th><th class="text-center">Incidencias</th><th>Viaje</th>
   </tr></thead><tbody>`;
   for (const t of tec) {
     const ausenciasStr = t.ausencias.map(a => `<span class="kpi-ausencia-item ${a.tipo.includes('Justificación') ? 'justificado' : a.tipo.includes('Licencia') ? 'medica' : a.tipo.includes('autorizado') ? 'autorizado' : 'injustificado'}">${a.tipo}</span>`).join(' ');
     const demorasStr = t.demoras.map(d => `<span class="kpi-ausencia-item demora">${d.tipo}</span>`).join(' ');
+    const incidenciasStr = ausenciasStr || demorasStr ? (ausenciasStr + ' ' + demorasStr) : '<span class="text-muted">-</span>';
+    const promSin = t.dias_sin_incidencia > 0 ? t.promedio_sin_incidencias : 0;
     html += `<tr><td><div class="kpi-tech-header">${t.nombre}</div></td>
       <td class="text-center highlight-cell">${t.dias_trabajados}</td>
       <td class="text-center highlight-cell">${fmtHrs(t.horas_totales)}</td>
-      <td class="text-center">${t.fs_total}</td><td class="text-center">${t.fs_presenciales}</td><td class="text-center">${t.fs_remotos}</td>
+      <td class="text-center">${fmtHrs(t.promedio_diario)}</td>
+      <td class="text-center">${fmtHrs(promSin)}</td>
+      <td class="text-center">${t.fs_total}</td>
+      <td class="text-center"><small>${t.fs_presenciales}P / ${t.fs_remotos}R</small></td>
       <td class="text-center">${t.tareas_completadas}${t.tareas_sin_solucion > 0 ? `<br><small class="text-danger">${t.tareas_sin_solucion} sin sol.</small>` : ''}</td>
+      <td class="text-center highlight-cell">${t.tickets_creados}</td>
       <td class="text-center">${t.tickets_resueltos}${t.tickets_sin_solucion > 0 ? `<br><small class="text-danger">${t.tickets_sin_solucion} sin sol.</small>` : ''}</td>
-      <td class="text-center">${ausenciasStr || '<span class="text-muted">-</span>'}</td>
-      <td class="text-center">${demorasStr || '<span class="text-muted">-</span>'}</td>
+      <td class="text-center">${incidenciasStr}</td>
       <td><small class="text-muted">${t.viaje_total_hms}</small></td></tr>`;
   }
   html += '</tbody></table></div></div>';
@@ -1138,7 +1434,14 @@ function renderKpi(data) {
   }
 
   // Tickets abiertos
-  html += `<div class="kpi-section"><h4>Incidencias Abiertas</h4><p class="text-muted">Total: ${data.kpi_tickets.totales_abiertos} tickets abiertos</p><div class="row g-3">`;
+  html += `<div class="kpi-section"><h4>Incidencias Abiertas</h4>
+  <div class="row g-2 mb-3">
+    <div class="col-auto"><span class="badge bg-info fs-6">${totalCreados} Creados en el mes</span></div>
+    <div class="col-auto"><span class="badge bg-success fs-6">${totalResueltos} Resueltos en el mes</span></div>
+    <div class="col-auto"><span class="badge ${data.kpi_tickets.totales_abiertos > 0 ? 'bg-warning text-dark' : 'bg-success'} fs-6">${data.kpi_tickets.totales_abiertos} Abiertos actualmente</span></div>
+    <div class="col-auto"><span class="badge bg-secondary fs-6">${totalCreados - totalResueltos} Diferencia neta</span></div>
+  </div>
+  <p class="text-muted">Tickets abiertos clasificados por prioridad y tiempo de antigüedad:</p><div class="row g-3">`;
   if (data.kpi_tickets.urgentes_mas_24h.cantidad > 0) {
     html += `<div class="col-md-4"><div class="card border-danger p-3"><h6 class="text-danger">Urgentes >24hs (${data.kpi_tickets.urgentes_mas_24h.cantidad})</h6><ul class="list-unstyled mb-0" style="font-size:0.85rem;">`;
     for (const t of data.kpi_tickets.urgentes_mas_24h.detalle.slice(0, 10)) html += `<li>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=HelpDesk&view=Detail&record=${t.ticketid}" target="_blank" rel="noreferrer">${t.ticket_no}</a>` : t.ticket_no} - ${t.cliente} (${t.dias_abierto}d)</li>`;
@@ -1192,22 +1495,27 @@ function renderKpi(data) {
 
   // Estado tecnicos resumido
   html += `<div class="kpi-section"><h4>Estado de Tecnicos Resumido</h4><div class="table-responsive"><table class="table kpi-table table-sm"><thead><tr>
-    <th>Tecnico</th><th class="text-center">Dias Trab.</th><th class="text-center">Horas</th><th class="text-center">Promedio Diario</th><th class="text-center">FS/Dia</th><th class="text-center">Eficiencia Tareas</th><th class="text-center">Ausencias</th><th>Estado</th>
+    <th>Tecnico</th><th class="text-center">Dias</th><th class="text-center">Horas</th><th class="text-center">Prom. Diario</th><th class="text-center">Prom. Sin Inc.</th><th class="text-center">FS/Dia</th><th class="text-center">Tickets Creados</th><th class="text-center">Tickets Resueltos</th><th class="text-center">Dif.</th><th class="text-center">Incidencias</th><th>Estado</th>
   </tr></thead><tbody>`;
   for (const t of tec) {
     const promDiario = t.dias_trabajados > 0 ? fmtHrs(t.horas_totales / t.dias_trabajados) : '0:00';
+    const promSin = t.dias_sin_incidencia > 0 ? fmtHrs(t.promedio_sin_incidencias) : '0:00';
     const fsDia = t.dias_trabajados > 0 ? (t.fs_total / t.dias_trabajados).toFixed(1) : '0.0';
-    const eficiencia = (t.tareas_completadas + t.tickets_resueltos) > 0 ? 'Ok' : 'Sin actividad';
+    const difTickets = t.tickets_creados - t.tickets_resueltos;
+    const difClass = difTickets > 0 ? 'text-danger' : difTickets < 0 ? 'text-success' : '';
     const totalIncidencias = t.ausencias.length + t.demoras.length;
     let estado = 'Normal', estadoClass = 'success';
-    if (totalIncidencias > 5) { estado = 'Requiere atencion'; estadoClass = 'danger'; }
-    else if (totalIncidencias > 2) { estado = 'Con observaciones'; estadoClass = 'warning'; }
+    if (totalIncidencias > 5 || difTickets > 5) { estado = 'Requiere atencion'; estadoClass = 'danger'; }
+    else if (totalIncidencias > 2 || difTickets > 2) { estado = 'Con observaciones'; estadoClass = 'warning'; }
     html += `<tr><td><strong>${t.nombre}</strong></td>
       <td class="text-center">${t.dias_trabajados}</td>
       <td class="text-center">${fmtHrs(t.horas_totales)}</td>
       <td class="text-center">${promDiario}</td>
+      <td class="text-center">${promSin}</td>
       <td class="text-center">${fsDia}</td>
-      <td class="text-center">${eficiencia}</td>
+      <td class="text-center highlight-cell">${t.tickets_creados}</td>
+      <td class="text-center">${t.tickets_resueltos}</td>
+      <td class="text-center ${difClass} fw-bold">${difTickets > 0 ? '+' : ''}${difTickets}</td>
       <td class="text-center">${totalIncidencias > 0 ? `<span class="text-${estadoClass}">${totalIncidencias}</span>` : '-'}</td>
       <td><span class="badge bg-${estadoClass}">${estado}</span></td></tr>`;
   }
@@ -1319,6 +1627,19 @@ function populateTecFilter() {
   if (!list) return;
   list.innerHTML = tecs.map(t => `<label><input type="checkbox" value="${t.replace(/"/g, '&quot;')}" onchange="onTecFilterChange()" checked> ${t}</label>`).join('');
   sinAsociarMensualTecFilter = null;
+}
+
+function populateTecnicosMenor6Filter() {
+  const sel = document.getElementById('tecnicosFiltro');
+  if (!sel) return;
+  const unique = [...new Set(currentTecnicosMenor6Data.map(t => `${t.first_name} ${t.last_name}`))];
+  sel.innerHTML = '<option value="">Todos los técnicos</option>';
+  for (const name of unique) {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    sel.appendChild(opt);
+  }
 }
 
 function populateCliFilter() {
@@ -1449,6 +1770,324 @@ function renderNegativosTable(data) {
 }
 
 // ============================================================
+// CRM INVENTORY
+// ============================================================
+let crmInventoryData = [];
+let contractsData = [];
+
+async function loadContracts() {
+  try {
+    const r = await fetch(`${API}/api/contracts`);
+    const data = await r.json();
+    contractsData = Array.isArray(data) ? data : [];
+  } catch(e) {
+    console.error('Error loading contracts:', e);
+  }
+}
+
+function contractsFor(empresa) {
+  if (!empresa || !contractsData.length) return [];
+  const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const n = norm(empresa);
+  const exact = contractsData.find(c => norm(c.empresa) === n);
+  if (exact) return exact.contracts;
+  const partial = contractsData.find(c => {
+    const k = norm(c.empresa);
+    return k.length >= 3 && (k.includes(n) || n.includes(k));
+  });
+  return partial ? partial.contracts : [];
+}
+
+function buildContractRows(empresa) {
+  const toRow = (name, c) => ({
+    name,
+    sub: c.accountName,
+    est: parseInt(c.estacionesTrabajo || 0),
+    fis: parseInt(c.servidoresFisicos || 0),
+    vir: parseInt(c.servidoresVirtuales || 0),
+  });
+  if (empresa && empresa !== 'TODOS') {
+    return contractsFor(empresa).map(c => toRow(empresa, c));
+  }
+  const rows = [];
+  for (const c of contractsData) {
+    for (const ct of c.contracts) rows.push(toRow(c.empresa, ct));
+  }
+  return rows;
+}
+
+function renderContractsTable(elId, rows) {
+  const tbl = document.getElementById(elId);
+  if (!tbl) return;
+  if (!rows.length) { tbl.style.display = 'none'; return; }
+  tbl.style.display = '';
+  const totalEst = rows.reduce((s, r) => s + r.est, 0);
+  const totalFis = rows.reduce((s, r) => s + r.fis, 0);
+  const totalVir = rows.reduce((s, r) => s + r.vir, 0);
+  tbl.querySelector('thead').innerHTML = `<tr>
+    <th>Cliente</th><th class="text-center">Contrato Estaciones de trabajo</th>
+    <th class="text-center">Contrato Servidores</th><th class="text-center">Contrato Servidores virtuales</th>
+    <th class="text-center">Total</th></tr>`;
+  let html = '';
+  for (const r of rows) {
+    const t = r.est + r.fis + r.vir;
+    html += `<tr>
+      <td><strong>${esc(r.name)}</strong>${r.sub && r.sub !== r.name ? `<div class="small text-muted">${esc(r.sub)}</div>` : ''}</td>
+      <td class="text-center">${r.est}</td>
+      <td class="text-center">${r.fis}</td>
+      <td class="text-center">${r.vir}</td>
+      <td class="text-center fw-semibold">${t}</td>
+    </tr>`;
+  }
+  if (rows.length > 1) {
+    html += `<tr class="table-dark">
+      <td><strong>Total</strong></td>
+      <td class="text-center">${totalEst}</td><td class="text-center">${totalFis}</td>
+      <td class="text-center">${totalVir}</td><td class="text-center fw-semibold">${totalEst + totalFis + totalVir}</td>
+    </tr>`;
+  }
+  tbl.querySelector('tbody').innerHTML = html;
+}
+
+function contractStatsHtml(rows) {
+  if (!rows.length) return '';
+  const totalEst = rows.reduce((s, r) => s + r.est, 0);
+  const totalFis = rows.reduce((s, r) => s + r.fis, 0);
+  const totalVir = rows.reduce((s, r) => s + r.vir, 0);
+  return `<div class="col-auto"><div class="stat-card border-info"><div class="num text-info">${totalEst}</div><div class="label">Contrato Estaciones de trabajo</div></div></div>
+    <div class="col-auto"><div class="stat-card border-info"><div class="num text-info">${totalFis}</div><div class="label">Contrato Servidores</div></div></div>
+    <div class="col-auto"><div class="stat-card border-info"><div class="num text-info">${totalVir}</div><div class="label">Contrato Serv. virtuales</div></div></div>`;
+}
+
+async function loadCrmInventory() {
+  try {
+    const [r, cr] = await Promise.all([
+      fetch(`${API}/api/crm/inventory`).then(r => r.json()),
+      fetch(`${API}/api/contracts`).then(r => r.json())
+    ]);
+    if (!r || r.error) return;
+    crmInventoryData = Array.isArray(r) ? r : [];
+    contractsData = Array.isArray(cr) ? cr : contractsData;
+    const clientes = [...new Set(crmInventoryData.map(d => d.cliente).filter(Boolean))].sort();
+    const sel = document.getElementById('crmInvCliente');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="TODOS">Todos los clientes</option>' + clientes.map(c => `<option value="${c.replace(/"/g, '&quot;')}">${c}</option>`).join('');
+    sel.value = prev;
+    renderCrmInventory();
+  } catch(e) {
+    console.error('Error loading CRM inventory:', e);
+  }
+}
+
+function renderCrmInventory() {
+  const search = (document.getElementById('crmInvSearch').value || '').toLowerCase();
+  const activo = document.getElementById('crmInvActivo').value;
+  const equipo = document.getElementById('crmInvEquipo').value;
+  const cliente = document.getElementById('crmInvCliente').value;
+
+  let filtered = crmInventoryData.filter(d => {
+    if (cliente !== 'TODOS' && d.cliente !== cliente) return false;
+    if (search) {
+      const haystack = `${d.hostname || ''} ${d.serialNumber || ''} ${d.uuid || ''} ${d.usuario || ''} ${d.cliente || ''} ${(d.macAddress || []).join(' ')}`.toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    if (activo === 'si' && !d.usuarioActivo) return false;
+    if (activo === 'no' && d.usuarioActivo) return false;
+    if (equipo && d.equipoAsignado !== parseInt(equipo)) return false;
+    return true;
+  });
+
+  document.getElementById('crmInvCount').textContent = `${filtered.length} equipos`;
+  const clientes = [...new Set(filtered.map(d => d.cliente))].length;
+  const contractRows = buildContractRows(cliente);
+  renderContractsTable('crmInvContractsTable', contractRows);
+  document.getElementById('crmInvStats').innerHTML = `<div class="col-auto"><div class="stat-card"><div class="num text-primary">${clientes}</div><div class="label">Clientes</div></div></div>` + contractStatsHtml(contractRows);
+
+  const tbl = document.getElementById('crmInvTable');
+  tbl.querySelector('thead').innerHTML = `<tr>
+    <th>Cliente</th><th>Equipo</th><th>Usuario</th><th>Activo</th><th>Hostname</th>
+    <th>Serial</th><th>UUID</th><th>MACs</th></tr>`;
+
+  let html = '';
+  for (const d of filtered) {
+    const macs = (d.macAddress || []).map(m => `<code class="small">${m}</code>`).join('<br>');
+    html += `<tr>
+      <td>${d.cliente || '-'}</td>
+      <td class="text-center">${d.equipoAsignado || '-'}</td>
+      <td><small>${d.usuario || '-'}</small></td>
+      <td class="text-center">${d.usuarioActivo ? '<span class="badge bg-success" style="font-size:0.6rem">SI</span>' : '<span class="badge bg-danger" style="font-size:0.6rem">NO</span>'}</td>
+      <td><strong>${d.hostname || '-'}</strong></td>
+      <td class="small">${d.serialNumber || '-'}</td>
+      <td class="small" style="font-size:0.6rem">${d.uuid || '-'}</td>
+      <td class="small">${macs || '-'}</td>
+    </tr>`;
+  }
+  tbl.querySelector('tbody').innerHTML = html;
+}
+
+// ============================================================
+// ESET INVENTORY
+// ============================================================
+let esetInventoryData = [];
+let esetLicData = [];
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function licBadge(fecha) {
+  if (!fecha) return '';
+  return new Date(fecha) < new Date()
+    ? '<span class="badge bg-danger" style="font-size:0.6rem">VENCIDO</span>'
+    : '<span class="badge bg-success" style="font-size:0.6rem">Vigente</span>';
+}
+
+async function loadEsetInventory() {
+  try {
+    const sel = document.getElementById('esetInvCliente');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">Cargando...</option>';
+    sel.disabled = true;
+    const r = await fetch(`${API}/api/eset/clients`);
+    const clients = await r.json();
+    sel.innerHTML = '<option value="">Seleccionar cliente...</option>' +
+      clients.map(c => `<option value="${esc(c.empresa)}">${c.empresa}</option>`).join('');
+    sel.value = prev && [...sel.options].some(o => o.value === prev) ? prev : '';
+    sel.disabled = false;
+    document.getElementById('esetInvCount').textContent = `${clients.length} clientes con ESET`;
+    document.getElementById('esetInvTable').querySelector('tbody').innerHTML =
+      '<tr><td colspan="7" class="text-center text-muted">Seleccione un cliente y haga clic en Consultar</td></tr>';
+    document.getElementById('esetInvStats').innerHTML = '';
+    await loadEsetLicencias();
+  } catch(e) {
+    console.error('Error loading ESET clients:', e);
+  }
+}
+
+async function loadEsetLicencias() {
+  try {
+    const r = await fetch(`${API}/api/eset/licencias`);
+    const data = await r.json();
+    esetLicData = Array.isArray(data) ? data : [];
+    renderEsetLicencias();
+    const sel = document.getElementById('esetInvCliente');
+    if (sel && sel.value) {
+      const lic = esetLicData.find(l => l.empresa === sel.value);
+      if (lic) renderEsetLicCards(lic);
+    }
+  } catch(e) {
+    console.error('Error loading ESET licencias:', e);
+  }
+}
+
+function renderEsetLicencias() {
+  const tbl = document.getElementById('esetLicTable');
+  if (!tbl) return;
+  tbl.querySelector('thead').innerHTML = `<tr>
+    <th>Cliente</th><th>Antivirus</th><th>Fecha de vencimiento</th>
+    <th>Cantidad de licencias</th><th>Clave de licencia</th></tr>`;
+
+  let html = '';
+  for (const l of esetLicData) {
+    const cs = l.contracts || [];
+    if (cs.length === 0) {
+      html += `<tr class="table-light"><td><strong>${esc(l.empresa)}</strong></td><td colspan="4" class="text-muted small">Sin datos de licencia en CRM</td></tr>`;
+      continue;
+    }
+    for (const c of cs) {
+      const ven = c.fechaVencimiento || '-';
+      html += `<tr style="cursor:pointer" onclick="selectEsetCliente('${esc(l.empresa).replace(/'/g, "\\'")}')">
+        <td><strong>${esc(l.empresa)}</strong>${cs.length > 1 ? `<div class="small text-muted">${esc(c.accountName || '')}</div>` : ''}</td>
+        <td class="small">${esc(c.antivirus) || '-'}</td>
+        <td class="small">${ven} ${licBadge(c.fechaVencimiento)}</td>
+        <td class="small">${esc(c.cantidadLicencias) || '-'}</td>
+        <td class="small" style="font-size:0.65rem">${esc(c.claveLicencia) || '-'}</td>
+      </tr>`;
+    }
+  }
+  tbl.querySelector('tbody').innerHTML = html;
+}
+
+function renderEsetLicCards(lic) {
+  const el = document.getElementById('esetInvStats');
+  if (!el) return;
+  const cs = lic?.contracts || [];
+  if (cs.length === 0) { el.innerHTML = ''; return; }
+  const totalLic = cs.reduce((s, c) => s + parseInt(c.cantidadLicencias || 0), 0);
+  const ven = cs.map(c => c.fechaVencimiento).filter(Boolean)[0] || null;
+  const claves = cs.map(c => c.claveLicencia).filter(Boolean);
+  let html = '<div class="col-12"><small class="text-muted fw-semibold">Licencias del cliente</small></div>';
+  html += `<div class="col-auto"><div class="stat-card" style="border-left:3px solid #ffc107"><div class="num" style="font-size:1.1rem">${esc(cs.map(c => c.antivirus).filter(Boolean)[0]) || '-'}</div><div class="label">Antivirus</div></div></div>`;
+  html += `<div class="col-auto"><div class="stat-card" style="border-left:3px solid #ffc107"><div class="num" style="font-size:1.1rem">${ven || '-'} ${licBadge(ven)}</div><div class="label">Fecha de vencimiento (cf_1269)</div></div></div>`;
+  html += `<div class="col-auto"><div class="stat-card" style="border-left:3px solid #ffc107"><div class="num" style="font-size:1.1rem">${totalLic || '-'}</div><div class="label">Cantidad de licencias (cf_1271)</div></div></div>`;
+  for (const c of cs) {
+    if (c.claveLicencia) {
+      html += `<div class="col-auto"><div class="stat-card" style="border-left:3px solid #ffc107"><div class="num" style="font-size:0.8rem">${esc(c.claveLicencia)}</div><div class="label">Clave de licencia (cf_1273)${cs.length > 1 ? ' · ' + esc(c.accountName || '') : ''}</div></div></div>`;
+    }
+  }
+  el.innerHTML = html;
+}
+
+function selectEsetCliente(empresa) {
+  const sel = document.getElementById('esetInvCliente');
+  sel.value = empresa;
+  loadEsetClientInventory();
+}
+
+async function loadEsetClientInventory() {
+  const cliente = document.getElementById('esetInvCliente').value;
+  if (!cliente) return;
+  try {
+    document.getElementById('esetInvCount').textContent = 'Cargando...';
+    const r = await fetch(`${API}/api/eset/inventory/${encodeURIComponent(cliente)}`);
+    const data = await r.json();
+    if (!data || data.error) return;
+    esetInventoryData = Array.isArray(data) ? data : [];
+    renderEsetInventory();
+  } catch(e) {
+    console.error('Error loading ESET inventory:', e);
+  }
+}
+
+function renderEsetInventory() {
+  const search = (document.getElementById('esetInvSearch').value || '').toLowerCase();
+  const cliente = document.getElementById('esetInvCliente').value;
+
+  const lic = esetLicData.find(l => l.empresa === cliente);
+  renderEsetLicCards(lic);
+
+  let filtered = esetInventoryData.filter(d => {
+    if (search) {
+      const haystack = `${d.hostname || ''} ${d.serialNumber || ''} ${d.uuid || ''} ${(d.macAddress || []).join(' ')}`.toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+
+  document.getElementById('esetInvCount').textContent = `${filtered.length} equipos`;
+  document.getElementById('esetLicTable').style.display = filtered.length ? 'none' : '';
+
+  const tbl = document.getElementById('esetInvTable');
+  tbl.querySelector('thead').innerHTML = `<tr>
+    <th>Hostname</th><th>Serial</th><th>UUID</th>
+    <th>MACs</th><th>Región</th><th>ESET ID</th></tr>`;
+
+  let html = '';
+  for (const d of filtered) {
+    const macs = (d.macAddress || []).map(m => `<code class="small">${m}</code>`).join('<br>');
+    html += `<tr>
+      <td><strong>${esc(d.hostname) || '-'}</strong></td>
+      <td class="small">${esc(d.serialNumber) || '-'}</td>
+      <td class="small" style="font-size:0.6rem">${esc(d.uuid) || '-'}</td>
+      <td class="small">${macs || '-'}</td>
+      <td class="small">${esc(d.esetRegion) || '-'}</td>
+      <td class="small">${esc(d.esetId) || '-'}</td>
+    </tr>`;
+  }
+  tbl.querySelector('tbody').innerHTML = html;
+}
+
+// ============================================================
 // FILTER + DATE EVENT HANDLERS
 // ============================================================
 document.getElementById('filterInput').addEventListener('input', () => {
@@ -1466,8 +2105,13 @@ document.getElementById('filterInput').addEventListener('input', () => {
     renderTareasTable(currentTareasData);
   } else if (tab === 'tickets' && currentTicketsData.length) {
     renderTicketsTable(currentTicketsData);
+  } else if (tab === 'fssinasociar' && currentFsSinAsociarFullData.length) {
+    renderFsSinAsociarFullTable(currentFsSinAsociarFullData);
   }
 });
+
+document.getElementById('crmInvSearch').addEventListener('input', () => { renderCrmInventory(); });
+document.getElementById('esetInvSearch').addEventListener('input', () => { renderEsetInventory(); });
 
 document.getElementById('globalDate').addEventListener('change', () => {
   horasData = null; horasRealesData = null;
@@ -1479,6 +2123,91 @@ document.getElementById('globalDate').addEventListener('change', () => {
     else if (tab === 'sinasociar') loadSinAsociar();
   }
 });
+
+document.getElementById('tecnicosFiltro').addEventListener('change', function() {
+  renderTecnicosMenor6();
+});
+
+document.getElementById('tecnicosMonth').addEventListener('change', function() {
+  loadTecnicosMenor6();
+});
+
+async function loadTecnicosMenor6() {
+  const val = document.getElementById('tecnicosMonth').value;
+  if (!val) return;
+  const [year, month] = val.split('-');
+  try {
+    const r = await fetch(`${API}/api/tecnicos-menor6?year=${year}&month=${month}`);
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+    currentTecnicosMenor6Data = Array.isArray(data) ? data : [];
+    renderTecnicosMenor6();
+    populateTecnicosMenor6Filter();
+  } catch (error) {
+    document.getElementById('tecnicosContent').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+  }
+}
+
+function renderTecnicosMenor6() {
+  const filter = document.getElementById('tecnicosFiltro').value;
+  let data = currentTecnicosMenor6Data;
+  if (filter) data = data.filter(t => `${t.first_name} ${t.last_name}` === filter);
+
+  const countEl = document.getElementById('tecnicosTotalCount');
+  const totalDiasIncumplidos = data.reduce((s, t) => s + (t.dias_incumplidos || 0), 0);
+  countEl.textContent = `${data.length} técnicos · ${totalDiasIncumplidos} días`;
+
+  const content = document.getElementById('tecnicosContent');
+  if (!data.length) { content.innerHTML = '<div class="text-muted text-center py-4">Todos los técnicos cumplieron con el mínimo de 6 horas todos los días del mes.</div>'; return; }
+
+  const diasSemana = {Monday:'Lunes',Tuesday:'Martes',Wednesday:'Miércoles',Thursday:'Jueves',Friday:'Viernes',Saturday:'Sábado',Sunday:'Domingo',Mon:'Lun',Tue:'Mar',Wed:'Mié',Thu:'Jue',Fri:'Vie',Sat:'Sáb',Sun:'Dom'};
+
+  let html = '';
+  for (const t of data) {
+    const tecName = `${t.first_name} ${t.last_name}`;
+    const diasRow = t.dias.map(d => {
+      const fsItems = (d.fs_list || '').split('|').filter(f => f.trim()).map(f => `<div class="small text-muted">${f.trim()}</div>`).join('');
+      const ds = diasSemana[d.dia_semana] || d.dia_semana;
+      const cls = d.total_hours >= 4 ? 'bg-warning-subtle' : 'bg-danger-subtle';
+      const viajeStr = d.viaje_total_horas > 0 ? ` + viaje ${fmtHrs(d.viaje_total_horas)}` : '';
+      return `<tr class="${cls}">
+        <td class="text-nowrap">${ds} ${d.fecha_corta}</td>
+        <td class="text-center">${fmtHrs(d.horas_fs)}${viajeStr}</td>
+        <td class="text-center"><strong>${fmtHrs(d.total_hours)}</strong></td>
+        <td class="text-center">${d.fs_count}</td>
+        <td>${fsItems}</td>
+      </tr>`;
+    }).join('');
+
+    const totalHorasMes = t.dias.reduce((s, d) => s + d.total_hours, 0);
+
+    html += `<div class="card mb-3 border-0 shadow-sm">
+      <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center py-2" style="cursor:pointer" onclick="this.nextElementSibling.classList.toggle('d-none')">
+        <div>
+          <strong>${tecName}</strong>
+          <span class="badge bg-dark ms-2">${t.dias_incumplidos} días</span>
+        </div>
+        <div class="d-flex gap-3 small">
+          <span>Total mes: <strong>${fmtHrs(totalHorasMes)}</strong></span>
+          <span>↕</span>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0 small">
+          <thead class="table-light"><tr>
+            <th style="width:100px">Día</th>
+            <th style="width:140px" class="text-center">FS + Viaje</th>
+            <th style="width:80px" class="text-center">Total</th>
+            <th style="width:50px" class="text-center">FS</th>
+            <th>Formularios</th>
+          </tr></thead>
+          <tbody>${diasRow}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }
+  content.innerHTML = html;
+}
 
 init();
 </script>

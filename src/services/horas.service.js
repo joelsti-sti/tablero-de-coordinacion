@@ -2,6 +2,80 @@ const pool = require('../db/crm');
 
 const EXCLUDED_USERS = '(5, 6, 7, 72)';
 
+async function getTecnicosMenor6Horas(year, month) {
+  const y = year || new Date().getFullYear();
+  const m = month || String(new Date().getMonth() + 1).padStart(2, '0');
+  const firstDay = `${y}-${m}-01`;
+  const lastDay = new Date(y, parseInt(m), 0).toISOString().split('T')[0];
+
+  const [rows] = await pool.query(`
+    SELECT
+      u.first_name, u.last_name,
+      DATE_FORMAT(scf.cf_960, '%Y-%m-%d') as fecha,
+      TIME_FORMAT(scf.cf_960, '%d/%m') as fecha_corta,
+      DAYNAME(scf.cf_960) as dia_semana,
+      SUM(TIME_TO_SEC(TIMEDIFF(scf.cf_934, scf.cf_932)) / 3600) as horas_fs,
+      COALESCE(SUM(scf.cf_1211), 0) as viaje_ida,
+      COALESCE(SUM(scf.cf_1213), 0) as viaje_vuelta,
+      COUNT(*) as fs_count,
+      GROUP_CONCAT(DISTINCT CONCAT(sc.contract_no, ' (', TIME_FORMAT(scf.cf_932, '%H:%i'), '-', TIME_FORMAT(scf.cf_934, '%H:%i'), ')') SEPARATOR '|') as fs_list
+    FROM vtiger_servicecontracts sc
+    JOIN vtiger_crmentity e ON sc.servicecontractsid = e.crmid AND e.deleted = 0
+    JOIN vtiger_users u ON e.smownerid = u.id AND u.deleted = 0
+    LEFT JOIN vtiger_servicecontractscf scf ON sc.servicecontractsid = scf.servicecontractsid
+    WHERE scf.cf_960 BETWEEN ? AND ?
+      AND scf.cf_932 IS NOT NULL
+      AND scf.cf_934 IS NOT NULL
+      AND u.id NOT IN ${EXCLUDED_USERS}
+    GROUP BY u.id, u.first_name, u.last_name, scf.cf_960
+    HAVING (SUM(TIME_TO_SEC(TIMEDIFF(scf.cf_934, scf.cf_932)) / 3600) + (COALESCE(SUM(scf.cf_1211), 0) + COALESCE(SUM(scf.cf_1213), 0)) / 60) < 6
+    ORDER BY u.last_name, u.first_name, scf.cf_960
+  `, [firstDay, lastDay]);
+
+  const tecMap = new Map();
+  for (const row of rows) {
+    const key = `${row.first_name} ${row.last_name}`;
+    if (!tecMap.has(key)) {
+      tecMap.set(key, {
+        first_name: row.first_name,
+        last_name: row.last_name,
+        dias: []
+      });
+    }
+    const horasFS = parseFloat(row.horas_fs) || 0;
+    const viajeTotalMin = (parseInt(row.viaje_ida) || 0) + (parseInt(row.viaje_vuelta) || 0);
+    const viajeHoras = viajeTotalMin / 60;
+    const totalHoras = horasFS + viajeHoras;
+    tecMap.get(key).dias.push({
+      fecha: row.fecha,
+      fecha_corta: row.fecha_corta,
+      dia_semana: row.dia_semana,
+      horas_fs: Math.round(horasFS * 100) / 100,
+      viaje_ida: parseInt(row.viaje_ida) || 0,
+      viaje_vuelta: parseInt(row.viaje_vuelta) || 0,
+      viaje_total_horas: Math.round(viajeHoras * 100) / 100,
+      total_hours: Math.round(totalHoras * 100) / 100,
+      fs_count: row.fs_count,
+      fs_list: row.fs_list
+    });
+  }
+
+  const result = [];
+  for (const [, tec] of tecMap) {
+    const totalHorasMes = tec.dias.reduce((s, d) => s + d.total_hours, 0);
+    result.push({
+      first_name: tec.first_name,
+      last_name: tec.last_name,
+      dias_incumplidos: tec.dias.length,
+      total_horas_mes: Math.round(totalHorasMes * 100) / 100,
+      dias: tec.dias
+    });
+  }
+  result.sort((a, b) => a.last_name.localeCompare(b.last_name) || a.first_name.localeCompare(b.first_name));
+
+  return result;
+}
+
 const FS_FROM = `
   FROM vtiger_users u
   INNER JOIN vtiger_crmentity e ON u.id = e.smownerid AND e.deleted = 0
@@ -485,20 +559,68 @@ async function getTareasPendientes(year, month) {
       t.projecttaskid, t.projecttask_no as task_no,
       t.projecttaskname as task_name, t.projecttaskstatus as status,
       tf.cf_1134 as solucion, p.projectname,
-      p.project_no as project_no, cr.createdtime as created_date,
+      p.project_no as project_no, a.accountname as cliente,
+      cr.createdtime as created_date,
       CONCAT(u.first_name, ' ', u.last_name) as assigned_user
     FROM vtiger_projecttask t
     JOIN vtiger_crmentity cr ON t.projecttaskid = cr.crmid AND cr.deleted = 0
     LEFT JOIN vtiger_projecttaskcf tf ON t.projecttaskid = tf.projecttaskid
     LEFT JOIN vtiger_project p ON t.projectid = p.projectid
+    LEFT JOIN vtiger_account a ON p.linktoaccountscontacts = a.accountid
     LEFT JOIN vtiger_users u ON cr.smownerid = u.id
-    WHERE t.projecttaskstatus IN ('Completed', 'Cerrada')
+    WHERE t.projecttaskstatus IN ('Completed', 'Cerrada', 'Resuelto')
       AND (tf.cf_1134 IS NULL OR tf.cf_1134 = '')
       AND MONTH(cr.createdtime) = ?
       AND YEAR(cr.createdtime) = ?
     ORDER BY cr.createdtime DESC
   `, [parseInt(m), parseInt(y)]);
   return rows;
+}
+
+async function getFsSinAsociarFull(year, month) {
+  const y = year || new Date().getFullYear();
+  const m = month || String(new Date().getMonth() + 1).padStart(2, '0');
+  const firstDay = `${y}-${m}-01`;
+  const lastDay = new Date(y, parseInt(m), 0).toISOString().split('T')[0];
+
+  const [relRows] = await pool.query(`
+    SELECT fs_id FROM (
+      SELECT crmid as fs_id FROM vtiger_crmentityrel
+      WHERE module = 'ServiceContracts' AND relmodule IN ('HelpDesk', 'ProjectTask')
+      UNION
+      SELECT relcrmid as fs_id FROM vtiger_crmentityrel
+      WHERE relmodule = 'ServiceContracts' AND module IN ('HelpDesk', 'ProjectTask')
+    ) t GROUP BY fs_id
+  `);
+  const relatedIds = new Set(relRows.map(r => r.fs_id));
+
+  const [rows] = await pool.query(`
+    SELECT
+      CONCAT(u.first_name, ' ', u.last_name) as assigned_user,
+      sc.servicecontractsid as fs_id,
+      sc.sc_related_to,
+      sc.subject as fs_name,
+      sc.contract_no as fs_numero,
+      scf.cf_960 as fs_fecha,
+      a.accountname as cliente,
+      TIME(scf.cf_932) as hora_inicio,
+      TIME(scf.cf_934) as hora_fin,
+      TIME_TO_SEC(TIMEDIFF(scf.cf_934, scf.cf_932)) / 3600 as horas
+    ${FS_FROM}${FS_ACCOUNT}
+    WHERE scf.cf_960 BETWEEN ? AND ?
+      AND scf.cf_932 IS NOT NULL
+      AND scf.cf_934 IS NOT NULL
+      AND u.deleted = 0
+      AND u.id NOT IN ${EXCLUDED_USERS}
+    ORDER BY scf.cf_960, u.last_name, u.first_name, scf.cf_932
+  `, [firstDay, lastDay]);
+
+  return rows.filter(row => {
+    const id = row.fs_id || row.servicecontractsid;
+    if (relatedIds.has(id)) return false;
+    if (row.sc_related_to === 2) return false;
+    return true;
+  });
 }
 
 async function getTicketsPendientes(year, month) {
@@ -602,6 +724,17 @@ async function getKpiMensual(year, month) {
     GROUP BY cr.smownerid
   `, [`${y}-${m}`]);
 
+  const [ticketsCreadosRows] = await pool.query(`
+    SELECT cr.smownerid as user_id, CONCAT(u.first_name, ' ', u.last_name) as nombre,
+      COUNT(*) as total
+    FROM vtiger_troubletickets tk
+    JOIN vtiger_crmentity cr ON tk.ticketid = cr.crmid AND cr.deleted = 0
+    JOIN vtiger_users u ON cr.smownerid = u.id AND u.deleted = 0
+    WHERE DATE_FORMAT(cr.createdtime, '%Y-%m') = ?
+      AND u.id NOT IN ${EXCLUDED_USERS}
+    GROUP BY cr.smownerid
+  `, [`${y}-${m}`]);
+
   const [ticketsAbiertos] = await pool.query(`
     SELECT tk.ticketid, tk.ticket_no, tk.title, tk.status, tk.priority,
       a.accountname as cliente, CONCAT(u.first_name, ' ', u.last_name) as assigned_user,
@@ -678,12 +811,19 @@ async function getKpiMensual(year, month) {
         user_id: fs.user_id, nombre: fs.nombre, horas_totales: 0,
         dias_trabajados: new Set(), fs_total: 0,
         fs_presenciales: 0, fs_remotos: 0, fs_otros: 0,
-        viaje_total: 0, ausencias: [], demoras: [], fs_list: []
+        viaje_total: 0, ausencias: [], demoras: [], fs_list: [],
+        horas_por_dia: {}, dias_con_incidencia: new Set()
       });
     }
     const t = tecMap.get(key);
-    t.horas_totales += parseFloat(fs.horas) || 0;
-    if (fs.fecha) t.dias_trabajados.add(fs.fecha.substring(0, 10));
+    const horasVal = parseFloat(fs.horas) || 0;
+    t.horas_totales += horasVal;
+    if (fs.fecha) {
+      const dateKey = fs.fecha.substring(0, 10);
+      t.dias_trabajados.add(dateKey);
+      t.horas_por_dia[dateKey] = (t.horas_por_dia[dateKey] || 0) + horasVal;
+      if (fs.ausencia_tipo) t.dias_con_incidencia.add(dateKey);
+    }
     t.fs_total++;
     if (fs.modalidad === 'Presencial') t.fs_presenciales++;
     else if (fs.modalidad === 'Remoto') t.fs_remotos++;
@@ -710,19 +850,40 @@ async function getKpiMensual(year, month) {
   for (const r of tareasRows) tareasMap.set(r.user_id, r);
   const ticketsMap = new Map();
   for (const r of ticketsRows) ticketsMap.set(r.user_id, r);
+  const ticketsCreadosMap = new Map();
+  for (const r of ticketsCreadosRows) ticketsCreadosMap.set(r.user_id, r);
 
   const tecnicos = [];
   for (const [, t] of tecMap) {
     const tareas = tareasMap.get(t.user_id);
     const tickets = ticketsMap.get(t.user_id);
+    const ticketsCreados = ticketsCreadosMap.get(t.user_id);
+    const totalDias = t.dias_trabajados.size;
+    const diasIncidencias = t.dias_con_incidencia.size;
+    const diasSinIncidencias = totalDias - diasIncidencias;
+    let horasSinIncidencias = 0;
+    for (const [dateKey, hrs] of Object.entries(t.horas_por_dia)) {
+      if (!t.dias_con_incidencia.has(dateKey)) horasSinIncidencias += hrs;
+    }
+    const promCon = totalDias > 0 ? t.horas_totales / totalDias : 0;
+    const promSin = diasSinIncidencias > 0 ? horasSinIncidencias / diasSinIncidencias : 0;
     tecnicos.push({
-      ...t, dias_trabajados: t.dias_trabajados.size,
+      user_id: t.user_id, nombre: t.nombre,
       horas_totales: Math.round(t.horas_totales * 100) / 100,
+      dias_trabajados: totalDias,
+      dias_sin_incidencia: diasSinIncidencias,
+      horas_sin_incidencia: Math.round(horasSinIncidencias * 100) / 100,
+      promedio_diario: Math.round(promCon * 100) / 100,
+      promedio_sin_incidencias: Math.round(promSin * 100) / 100,
+      fs_total: t.fs_total,
+      fs_presenciales: t.fs_presenciales, fs_remotos: t.fs_remotos, fs_otros: t.fs_otros,
+      viaje_total: t.viaje_total, ausencias: t.ausencias, demoras: t.demoras, fs_list: t.fs_list,
       viaje_total_hms: t.viaje_total > 0
         ? `${Math.floor(t.viaje_total / 60)}:${String(t.viaje_total % 60).padStart(2, '0')}`
         : '0:00',
       tareas_completadas: tareas ? parseInt(tareas.total) : 0,
       tareas_sin_solucion: tareas ? parseInt(tareas.sin_solucion) : 0,
+      tickets_creados: ticketsCreados ? parseInt(ticketsCreados.total) : 0,
       tickets_resueltos: tickets ? parseInt(tickets.total) : 0,
       tickets_sin_solucion: tickets ? parseInt(tickets.sin_solucion) : 0
     });
@@ -785,5 +946,6 @@ module.exports = {
   getHoras, getFsDetalle, getHorasReales, getHorasMensual,
   getFsSinAsociar, getFsSinAsociarMensual, getHorasMensualDetalle,
   getFsNegativos, getFsNegativosMensual,
-  getTareasPendientes, getTicketsPendientes, getKpiMensual
+  getTareasPendientes, getTicketsPendientes, getKpiMensual,
+  getFsSinAsociarFull, getTecnicosMenor6Horas
 };

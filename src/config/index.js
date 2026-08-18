@@ -26,4 +26,5 @@ module.exports = {
   },
   PORT: parseInt(process.env.PORT || '3005'),
   OCS_CACHE_PATH: process.env.OCS_CACHE_PATH || './ocs_cache.json',
+  OCS_CACHE_REFRESH_INTERVAL: parseInt(process.env.OCS_CACHE_REFRESH_INTERVAL || '300000'), // 5 min
 };

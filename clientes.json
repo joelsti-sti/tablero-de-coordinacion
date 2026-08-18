@@ -2,21 +2,21 @@
   {
     "empresa": "Aconcagua / Aconcagua Lanus",
     "email_eset": "aconcagua2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "ACONCAGUA",
     "sheets": { "generales": "1MiEQ1TCRdDGylNOQIqy5FTsLXlmbBd_UPbcDmgcXluQ", "terminales": "1_YdxkwmiXxhlGgEEkv9LZsSrLPHH0qM8RLvs5Q7P1TE", "servidores": "1XeSsWdwKcK3Rzf_nPSh1lrgLVwMUVD04yT0JDgg31m8" }
   },
   {
     "empresa": "Bi Emprendimientos / Metropolitan",
     "email_eset": "biemprendimientos2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "BI",
     "sheets": { "generales": "1fzSOWrglDg3P9i8Zx7f_WykQ70LyXWYIIidENE0OlqE", "terminales": "1-6ydnezSCNbEDM2mKYMVWUTm8YnkTBAjzMp3iKLY1Og", "servidores": "127vOSabrYsDIvsRhFk2YTQycH6U8wqqrDcXUgxqg09o" }
   },
   {
     "empresa": "Black Out - BLKLEDS SA",
     "email_eset": "blackout2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "BLACKOUT",
     "sheets": { "generales": "1pzCagXnEGO3OEaQUtMUz1EELqG_eIM4PPE_j3Jn1fD0", "terminales": "15kvCR7Cd6GFS4bqIyMd14uTnXJ0GEBHrsD5XrBJPe1U", "servidores": "1uEL3ro2V2fpeS0XTyVstpIFWyw5E2jiXeToAJLhoeMU" }
   },
@@ -30,28 +30,28 @@
   {
     "empresa": "Boragh SRL / Majama",
     "email_eset": "majama2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "MAJAMA",
     "sheets": { "generales": "1uRkHs0E4VsY-Q7_MVsvkMn-mNZk17rUPvZZzajdsas4", "terminales": "1jQDH26PF8PXtOqXBwosgS2AnKOFQCBpq7toF-dR11YU", "servidores": "1lRIpcjVXrfJHXSeEIn83LaGFb095iDTmuNZY0AWJOlA" }
   },
   {
     "empresa": "Calzetta",
     "email_eset": "calzetta2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "CALZETTA",
     "sheets": { "generales": "1jmWg3l2oCWz6tfjcrDWvLZFEPtnMWjtEeVTG4uCnMAo", "terminales": "1ce6kBRhWKfJ4Ahq3dm1QwhMBdCMUTZTeowk7hk60cw4", "servidores": "1PSIQe22LpAMpP5F4kl5uCRMyqSIxqCk9bK_KdM8f27s" }
   },
   {
     "empresa": "Cambytur",
     "email_eset": "cambytur2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "CAMBYTUR",
     "sheets": { "generales": "1I5pjn_pfztcX93FGsJdIEqGsSyKy5sPK7zTZSqKbpl0", "terminales": "1Wjc5_rbBeU6dpkIwdRv5fNv6qilcekNpoOzUREyz_LU", "servidores": null }
   },
   {
     "empresa": "CIRTSA",
     "email_eset": "cirtsa2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "CIRTSA",
     "sheets": { "generales": "1CM5ZnGwkYmnDA11eQsJOHjt4guta6CmzmbdElaLZZMk", "terminales": null, "servidores": null }
   },
@@ -72,7 +72,7 @@
   {
     "empresa": "DPMG SA",
     "email_eset": "dpmg@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "DPMG",
     "sheets": { "generales": "1TLk0TBXd0kZ4yNsiT50YcW4iu-1gYjMmg5wHjKue3r8", "terminales": "1EsBBojCC_Eq3BWVkkuv9xPMgGjVqtieqG1D3W20qLMI", "servidores": "1kDTfXz79XLAWnkDSE3AZMkk5nq6cOTeFbjfDUz36Ejg" }
   },
@@ -86,21 +86,21 @@
   {
     "empresa": "Emege (Gomez y Medinilla)",
     "email_eset": "emege2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "EMEGE",
     "sheets": { "generales": "1mdEydLCMVztu79EtXOhNF36NNXWjsgKyrX7NZxTXpN0", "terminales": "1fuUk8H22AypQ0H35MbZsv-wpoCQJZ225RiSa-DxEL0w", "servidores": "1_1PdUYdN0JqTsN8cwHw_mrMyHvHOtD6LGgEN9ZZpjo0" }
   },
   {
     "empresa": "EON / Giampaoletti",
     "email_eset": "eon2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "EON",
     "sheets": { "generales": "1TkOWNzBy8re-5f2UFjp-ORxlu7uDRimcrALvo3w8MXo", "terminales": "1_ordq7wX9QLlkdnynZIuc3NjWe85-o3b64PIxxsBV20", "servidores": "1L5dPavwpmeFBnUPFvyV4Gx7DJnQmMVPqGlsJ0OOV5l4" }
   },
   {
     "empresa": "Estudio B&M / Muñoz",
     "email_eset": "munoz2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "MUÑOZ",
     "sheets": { "generales": "1dV0XvGvaEZ-HoLnV5T5SWqLi00zbdEdGBNCRUs8UZGc", "terminales": "13ErFuJIsRxpmD-lcrtbixp_OaQ9V9H73yIt-YLuBvb8", "servidores": null }
   },
@@ -114,7 +114,7 @@
   {
     "empresa": "ETC",
     "email_eset": "etc2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "ETC",
     "sheets": { "generales": "1WlO7hYfeS3UJx6v4ODY7fQYgpx_bzHs2yfc5WykPSOk", "terminales": "1LOnsXIaKzr8C22ktWy1WHG5q6F6AvsOZcHaOY6M5Txs", "servidores": "1VfuysTN3-sQXrV2UOpAwqIaL3USkQcsNPiZpwNVMSow" }
   },
@@ -128,35 +128,35 @@
   {
     "empresa": "FoodDistri - ULAX DISTRIBUCION SA",
     "email_eset": "fooddistri2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "FOODDISTRI",
     "sheets": { "generales": "1XgU8gGcUk0kqU35oSa-vkl49213zpvBWWoEmWmGLZVM", "terminales": "1n5tQmj5WuEpss4PUcZ5ATMc9MiEHnU6op2CpDDyYpKk", "servidores": "1TX1IE54Y3zoni0WzdeuXj97JNmWn2XiKDbajI3_VSO4" }
   },
   {
     "empresa": "GASPETROL LTDA",
     "email_eset": "gaspetrol2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "GASPETROL",
     "sheets": { "generales": "17T75asF6y94KGTY7NIR4zOcapZvXLV7CH0tq0Gc0zo8", "terminales": "1M4CAzPiAZiOgTCEyo2miaD67EM2AJ3XkNz5DVZ5FC1M", "servidores": null }
   },
   {
     "empresa": "Gidfood",
     "email_eset": "gidfood@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "GID",
     "sheets": { "generales": "1EJ5iFSFeeM_RhXq2uhshNVJP8LqyaNAR88VLlDUSL2s", "terminales": "1sWV7V4n00wJNFLvAEbiCiyggXdT55wl2G4ruuBz5QJM", "servidores": "1q3irwyeLSpW0JN3v_mszRSIxkSnOO1kWVAyT3b8mnHI" }
   },
   {
     "empresa": "Griffo",
     "email_eset": "griffo2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "GRIFFO",
     "sheets": { "generales": "1pEL6TFzhSXhfo24L6VhIqwt2NWc3GqFqJf2m5t7tl9g", "terminales": "1usmSQ-8xl3JqWPZp0iy3Repd0g85pZtG3pF1Tolmqfo", "servidores": "1YqrsubGVYP4OxwajTB65OlS9XFpJUsxqT9jVqffpPbc" }
   },
   {
     "empresa": "Grosso",
     "email_eset": "grosso2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "GROSSO",
     "sheets": { "generales": "1I_wtlWgpEt5y_yQJWNc72pKi0N-lFJJGmQkMX5KXnTs", "terminales": "1pxGp6qierwTrcCDFdFohRTpOxQSl9reBgSx5keJB1LQ", "servidores": null }
   },
@@ -177,42 +177,42 @@
   {
     "empresa": "IG (Ingeniería Gastronómica)",
     "email_eset": "igsa2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "IGSA",
     "sheets": { "generales": "1TsB-7VpxYUYLWFo5NZF3-gXQpPNLvJeTzzdmvZJwXcQ", "terminales": "1tBKE1mBu9TDVKRwgo5A8-Oxuf_DjXjA9LMhJpY-SPwc", "servidores": "1e1LLnRL3o1N5BDrUT8ReHDfmSi2CuwcnXAXzvWlF9yU" }
   },
   {
     "empresa": "Imecon",
     "email_eset": "imecon2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "IMECON",
     "sheets": { "generales": "1Fhx7B77MVKHocEVu7ufeh1DnXkrFARGMPV1UAIUMe8", "terminales": "1RW9DQMgKEPPACoLtSn5Vhg6M5N3mjHZqWP3RmUb1zRo", "servidores": null }
   },
   {
     "empresa": "Indelplas / De la Fuente Ricardo",
     "email_eset": "indelplas2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "INDELPLAS",
     "sheets": { "generales": "1x62wZRPEUky8utHVsYRbFcxGRBhv2HxaPjeEdaEL5HE", "terminales": "1_uRWpD3yd32hp5_IKRagLTqFy7IgEOXBJGCfdpaGzik", "servidores": "13LOOG0HORypH4d58CLQ6jeo_At0Xwj9aQuxVBFf68po" }
   },
   {
     "empresa": "Ksigma",
     "email_eset": "ksigma2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "KSIGMA",
     "sheets": { "generales": "1K8bav-5DSlx5oZcBjKm8I7eRz9P8s6DgZB1nZcxkGi0", "terminales": "1At_9-oqdxzgmIbIuVRKRT4lsnpZDgB_-1RK4IININPc", "servidores": "1JXvHkF1XY9qqHp5EnnysBrH7fNbgS03bXAqX53O_RTc" }
   },
   {
     "empresa": "Kydat",
     "email_eset": "kydat2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "KYDAT",
     "sheets": { "generales": "18qil6ejKgeDyGmRdvXP632ICgVZ3hhtgcrRksoUSHf4", "terminales": "1KIsWGz9J5HI26o1WgsJ6P-zrmTz_QXfZoURFCMq6AE8", "servidores": null }
   },
   {
     "empresa": "La Mutual",
     "email_eset": "mutual2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "MUTUAL",
     "sheets": { "generales": "1QbfRQoKbHTxXBKeQppcXbyaIXwzS_k0SgaEh8YoLzgk", "terminales": null, "servidores": "1YuG8VoL29zMhq7mxElhV12H70On1_l51uVlOmVDOOkY" }
   },
@@ -240,7 +240,7 @@
   {
     "empresa": "Manchinelli Montajes",
     "email_eset": "manchinelli2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "MANCHINELLI",
     "sheets": { "generales": "1E6Zbbl0Xic9RHESSMNhvbwKUiOET1qNoXbcSScOoLRM", "terminales": "1GTE92KUvDvtVcrZMjkmJxU91M9CcQ1pAtG7A75lv41g", "servidores": "1NbqbNW4CJE2K9jq_KByVR3OCwA47lXn-D8OOdHA9OMg" }
   },
@@ -261,7 +261,7 @@
   {
     "empresa": "Moka Knit / Sanagu",
     "email_eset": "mokaknit2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": ["MOKAKNIT", "MOKAKNIT_LO"],
     "sheets": { "generales": "1yE2GYvMLxZkUyiD7Mg38rQk5IwFezyRf2Oh8dzR0nzg", "terminales": "1qDokPyXEqrQM74hKQfmMWsSkgWZ6IX9sTynVEJMp3Lo", "servidores": null }
   },
@@ -275,28 +275,28 @@
   {
     "empresa": "MSH",
     "email_eset": "msh2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "MSH",
     "sheets": { "generales": "10AvlKeB8O4co7njZmsf-Ft5c6Gj7okJBYAoHuBKffkM", "terminales": "1XUER3ox-FDBCq0pxGjwt-zpFAsC4DI5BoLfv5Vr7dik", "servidores": "1tFNSh82VyKOCvcPkb27KKmv-FkbrsEFndGuLByFLr9g" }
   },
   {
     "empresa": "Multicable",
     "email_eset": "multicable2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "MULTICABLE",
     "sheets": { "generales": "1bgoZW_WbaYL4zZVYh7jGGKRbOWpb2mnF1BNa0PDLfe4", "terminales": "1Mim-74VssvlJIQuWuGRmMuFkU0rId4kzYAryxlztkTk", "servidores": "1CQOSr0DZibCNU6Q6mTln_3DNfJXC7NKm25ZXSoVsjJo" }
   },
   {
     "empresa": "NDC (Negocios del Campo)",
     "email_eset": "ncd2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "NDC",
     "sheets": { "generales": "17ipIIw3QGwiOjxxE8CkbyHtLGTnHk32AmRKZgunB8XI", "terminales": "1rbXpoP1MXlQTCG-OowJUj9-98ooErpryOdiTCou80fM", "servidores": null }
   },
   {
     "empresa": "Netools sas - Schraiber Pump",
     "email_eset": "netools2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "NETOOLS",
     "sheets": { "generales": "17F4bLTnUqIv1vyT0AVgENC4BNRnFqJOdWHxGSHHzmzg", "terminales": "18bXKxnev_TnDQzhRKG_R9M6epeDG7sWxdzo_z7kdUs4", "servidores": "1wJWkE7A8xLo8jQ9DN5gTYsFOPzb2Qfxso9Msnv847SQ" }
   },
@@ -324,59 +324,59 @@
   {
     "empresa": "Rafias PRI SIM Textil S.R.L.",
     "email_eset": "rafias2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "RAFIAS",
     "sheets": { "generales": "17dLJaNAvy7PXzC24D-qZlrqNbeCi8Kv90LVdd3aJaoA", "terminales": "1Tz36yyisubrA30GQQbjfAmImxHcFgCPHiE2lTDIxmd0", "servidores": "1aj-B5ujNNJW2g2tFxSm8UF5S_e13NQkgmW6xuj_lxuw" }
   },
   {
     "empresa": "Retak - Ardal SA",
     "email_eset": "ardal2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "ARDAL",
     "ocs_custom_url": "https://ocs.ardal.com.ar:44380",
     "ocs_custom_user": "soporte_sti",
-    "ocs_custom_pass": "Zm7H1lybRXbaXTWA",
+    "ocs_custom_pass": null,
     "sheets": { "generales": "1ya5qVlZ5EsZI9KPREM1UF59sltJv5t_dLXltsKAHjl8", "terminales": null, "servidores": "1FPpAq_zUqddQxqrZkfiM6P6gTSmlY0E1pgwaMoEXjN4" }
   },
   {
     "empresa": "Rivamar SA",
     "email_eset": "rivamar2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "RIVAMAR",
     "sheets": { "generales": "1VADawOjn_o9itYxTRY4ZO-RpRrrBGV54Qj8ps3NOLOs", "terminales": "1ROU9nX5IuR8DKaNBBlRVkFwtmO8YoaDLKXFve-BHfmM", "servidores": "1T4SCT2NWcll1H1ky5DeHkQ9pRfI7rZMH2K8dNIumi-I" }
   },
   {
     "empresa": "Rivas",
     "email_eset": "rivas2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "RIVAS",
     "sheets": { "generales": "1QGwh-G5CW9LyMTEMKd5qLLk7ikUex6V070Lu8xRexn4", "terminales": "1yWGskIXtkD4wvAc7SQfcMsCRvY1MW26hPZeZFUSNUBs", "servidores": "1401cp517PiFJdPqx6Td-WiWs-mpoKHDZ5yzhO9yVDJ8" }
   },
   {
     "empresa": "Rosito Vago",
     "email_eset": "rosito2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "ROSITO",
     "sheets": { "generales": "1ylAigZmwY2vNMMDJrhjf3kmqkcMun-q9lu8e0cNvhbg", "terminales": "1tk7n7E9jDVek1Xqazv1MabYyo0Y3q6OFSXzJ9aYausM", "servidores": "1j4k9FrJICp9UwQV2BtXIJ4pHsCi08QSvB0iRjc_wweU" }
   },
   {
     "empresa": "Ruta 12 (Avellaneda, La Boca, SM)",
     "email_eset": "ruta122@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "RUTA12",
     "sheets": { "generales": "1ayCRJ2Xhywm-6XTyK39ohMQnekckxfDIuAohFPpvCkk", "terminales": "1wNU5aR2SLiKAesyz_aBqP1u3EW38r23wWJWEBtUuwSM", "servidores": "1DadIQ0XYVFC88QzYY7ig2lmGZzdu7dbp0aF6nfzzZBo" }
   },
   {
     "empresa": "Santa Marta",
     "email_eset": "santamarta2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "SANTAMARTA",
     "sheets": { "generales": "1nHRZT6k-QXlWyW3Sm1pDw-MRtsSEisFzuzVBFecf-Ps", "terminales": "1RB8zi0m8OP31S6L23mXsa0l-G181pp6Z_PvMDxVMAoo", "servidores": null }
   },
   {
     "empresa": "Scherianz / Sycon",
     "email_eset": "scherianz2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "SCHERIANZ",
     "sheets": { "generales": "1SQQKu9EjFBRUba6ej9184H7cWocnwLZp5cLW10L6x5A", "terminales": "1fQ4fxrCTjQ6benBSmBIaZmdb642pFVUy4OYoTXOSHDo", "servidores": "1E-QtvSYZgcYCHYIkH5hokCHoNSw8wmVTsxESxvgL9Wk" }
   },
@@ -397,7 +397,7 @@
   {
     "empresa": "Textil Calchaquí",
     "email_eset": "textil2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "TEXTIL",
     "sheets": { "generales": "1AlJ86gSwok2nRIdO6iA4oniejT7E8OYZ8q9PlEPB1b4", "terminales": "1gTpx17DBRC2UOFbKh_Q0WMz44IDZhJms8YJ0OCImk24", "servidores": "1sABkCshIcJK3rRE2f-DXM4wFV_r6tAX5F_eF_z-r6FA" }
   },
@@ -432,7 +432,7 @@
   {
     "empresa": "Transporte Gomez",
     "email_eset": "gomez2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "GOMEZ",
     "sheets": { "generales": "1xRUh9YrPqOmHMTO1qKb7LdcURbopHJ85CXPKv6rs8", "terminales": "1SD0wmTgTVvhuDYvV_2Cv320nFnkPV-RNS0vU7PJrJr4", "servidores": null }
   },
@@ -446,22 +446,29 @@
   {
     "empresa": "Transportes Darritchon",
     "email_eset": "darritchon2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "DARRITCHON",
     "sheets": { "generales": "15io8ofpLbLMnCb9gjJ784o23RygZOXFPaTQQ0OCpOKM", "terminales": "1D-rgVZCxuyv8OHI016Lz9T2M2jB_aCAJPtE1mmfn8iI", "servidores": "18s_n757j0yvskTu-gaj_hBG4Gx7UnkphMU3kc7D57i0" }
   },
   {
     "empresa": "TSL / POP Cargo",
     "email_eset": "tsl2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "TSL",
     "sheets": { "generales": "1PSF1Gqgkp_KCXvzaX5bccQg1r-VZ-f1NhiAH-u4AePs", "terminales": "1y6vuEWpItWP6WYxMjqkWn81YoApLFcBSJqU1KCx7K-U", "servidores": "1GAzFlg2geRy5g7GpzVPtajHh-MLQc1Ed6WtvVS6NCOk" }
   },
   {
     "empresa": "TTEAR Transportes / SUMA DEL PLATA S.R.L",
     "email_eset": "ttear2@stidns.com",
-    "password_eset": "Sti,33784!+",
+    "password_eset": null,
     "tag_ocs": "TTEAR",
     "sheets": { "generales": "1mUTwUJjcIF-UgDpQRWPpm1MJmN4f3cND97IGfGd-mzI", "terminales": "1BFh_fy-Uxf2YFW9UdmjW_2mU2o147fgpVE2nalYlumQ", "servidores": "1lYCJ5-Rtsk0HG_17ItTG77ZHLY9dp2tLOPwVW8Y8SX4" }
+  },
+  {
+    "empresa": "SBE Tecnología Medica SRL",
+    "email_eset": null,
+    "password_eset": null,
+    "tag_ocs": "SBE",
+    "sheets": null
   }
 ]

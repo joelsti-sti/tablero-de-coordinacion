@@ -8,9 +8,14 @@ const { normalizeMac, normalizeSerial } = require('../utils/normalization');
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 const api = axios.create({ httpsAgent, timeout: 60000 });
 
+function classifyDeviceType(osname) {
+  return osname && /server/i.test(osname) ? 'server' : 'terminal';
+}
+
 let ocsCache = {}; // { TAG: [computers] }
 let ocsCacheLoading = false;
 let ocsCacheProgress = '';
+let ocsCacheLoadPromise = null;
 
 // Load initial cache from file
 try {
@@ -36,8 +41,12 @@ function saveCache() {
 }
 
 async function loadOcsCache() {
-  if (ocsCacheLoading) return;
+  if (ocsCacheLoading) {
+    if (ocsCacheLoadPromise) await ocsCacheLoadPromise;
+    return;
+  }
   ocsCacheLoading = true;
+  ocsCacheLoadPromise = (async () => {
   const startTime = Date.now();
   const config = OCS_DEFAULT;
   const authHeader = `Basic ${Buffer.from(`${config.auth.username}:${config.auth.password}`).toString('base64')}`;
@@ -96,9 +105,13 @@ async function loadOcsCache() {
             .map(n => normalizeMac(n.MACADDR))
             .filter(Boolean);
 
+          const hostname = hw.NAME || null;
+          const osname = hw.OSNAME || null;
           newCache[tagUpper].push({
             ocsId: hw.ID || parseInt(id),
-            hostname: hw.NAME || null,
+            hostname,
+            osname,
+            type: classifyDeviceType(osname),
             serialNumber: normalizeSerial(bios.SSN),
             uuid: hw.UUID && hw.UUID.length > 8 ? hw.UUID : null,
             macAddress: macs.length > 0 ? [...new Set(macs)] : null,
@@ -125,6 +138,8 @@ async function loadOcsCache() {
   } finally {
     ocsCacheLoading = false;
   }
+})();
+  await ocsCacheLoadPromise;
 }
 
 async function getOcsComputers(cliente) {
@@ -153,7 +168,10 @@ async function getOcsComputers(cliente) {
 async function getOcsComputersExternal(cliente) {
   const tags = (Array.isArray(cliente.tag_ocs) ? cliente.tag_ocs : [cliente.tag_ocs]).filter(Boolean);
   const baseURL = `${cliente.ocs_custom_url}/ocsapi/v1`;
-  const auth = { username: cliente.ocs_custom_user, password: cliente.ocs_custom_pass };
+  const auth = { 
+    username: cliente.ocs_custom_user, 
+    password: cliente.ocs_custom_pass || process.env.OCS_CUSTOM_MASTER_PASSWORD 
+  };
 
   const tagPromises = tags.map(async (tag) => {
     const tagResults = [];
@@ -179,11 +197,15 @@ async function getOcsComputersExternal(cliente) {
           .map(n => normalizeMac(n.MACADDR))
           .filter(Boolean);
 
+        const hostname = hw.NAME || null;
+        const osname = hw.OSNAME || null;
         tagResults.push({
           source: 'ocs',
           ocsId: hw.ID || parseInt(id),
           tagOcs: tag,
-          hostname: hw.NAME || null,
+          hostname,
+          osname,
+          type: classifyDeviceType(osname),
           serialNumber: normalizeSerial(bios.SSN),
           uuid: hw.UUID && hw.UUID.length > 8 ? hw.UUID : null,
           macAddress: macs.length > 0 ? [...new Set(macs)] : null
@@ -206,7 +228,8 @@ function getCacheStatus() {
     loading: ocsCacheLoading,
     progress: ocsCacheProgress,
     count: totalCount,
-    tags: Object.keys(ocsCache).length
+    tags: Object.keys(ocsCache).length,
+    refreshIntervalMs: parseInt(process.env.OCS_CACHE_REFRESH_INTERVAL || '300000'),
   };
 }
 
