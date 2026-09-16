@@ -52,6 +52,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
 .tech-header.bg-success { background: #1b8a4a !important; }
 .tech-header.bg-warning { background: #c97a0c !important; }
 .tech-header.bg-danger { background: #c23333 !important; }
+.tech-header.sin-carga { background: #9aa0a6 !important; cursor: default; }
 .tech-name { font-size: 1rem; font-weight: 600; margin: 0; }
 .tech-hours { font-size: 1.6rem; font-weight: 700; margin: 0; }
 .fs-list { max-height: 0; overflow-y: auto; transition: max-height 0.25s; background: #f8f9fa; }
@@ -67,6 +68,8 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
 .billboard-card:hover { opacity: 0.85; }
 .billboard-card .hours { font-size: 1.3rem; font-weight: 700; }
 .billboard-card .name { font-size: 0.75rem; }
+.billboard-card.sin-carga { background: #dadce0; color: #5f6368; }
+.billboard-section-title { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: #5f6368; margin-top: 1rem; margin-bottom: 0.4rem; }
 
 /* ===== STATS ===== */
 .stat-card { background: #fff; border-radius: 8px; padding: 1rem; border: 1px solid #e8eaed; text-align: center; height: 100%; }
@@ -166,6 +169,8 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
     <div class="sidebar-divider"></div>
     <div class="nav-item" data-tab="tareas"><span class="icon">📝</span><span class="label">Tareas Pendientes</span></div>
     <div class="nav-item" data-tab="tickets"><span class="icon">🎫</span><span class="label">Tickets Pendientes</span></div>
+    <div class="nav-item" data-tab="kpi"><span class="icon">📈</span><span class="label">KPI Mensual</span></div>
+    <div class="nav-item" data-tab="tecnicos"><span class="icon">👷</span><span class="label">Técnicos &lt; 6h</span></div>
     <div class="sidebar-divider"></div>
     <div class="nav-item" data-tab="comparacion"><span class="icon">🔍</span><span class="label">CRM / OCS / ESET</span></div>
     <div class="nav-item" data-tab="ocs"><span class="icon">🖥️</span><span class="label">Inventario OCS</span></div>
@@ -480,6 +485,7 @@ let refreshTimer = null;
 // Data stores
 let horasData = null;
 let horasRealesData = null;
+let horasSinCargaTecnicos = [];
 let mensualData = [];
 let cmpData = null;
 let ocsComputers = [];
@@ -594,6 +600,11 @@ function setupTabs() {
       else if (tab === 'crm-inventory') loadCrmInventory();
       else if (tab === 'eset-inventory') loadEsetInventory();
       else if (tab === 'sinasociar') loadSinAsociar();
+      else if (tab === 'kpi') {
+        const el = document.getElementById('kpiMes');
+        if (el && !el.value) el.value = new Date().toISOString().slice(0, 7);
+        loadKpi();
+      }
       else if (tab === 'tecnicos') {
         const el = document.getElementById('tecnicosMonth');
         if (el && !el.value) el.value = new Date().toISOString().slice(0, 7);
@@ -627,8 +638,16 @@ async function loadHoras() {
       fetch(`${API}/api/horas?date=${date}`).then(r => r.json()),
       fetch(`${API}/api/horasreales?date=${date}`).then(r => r.json())
     ]);
-    horasData = Array.isArray(h) ? h : [];
+    if (h && !Array.isArray(h)) {
+      horasData = Array.isArray(h.tecnicos) ? h.tecnicos : [];
+      horasSinCargaTecnicos = Array.isArray(h.tecnicosSinCarga) ? h.tecnicosSinCarga : [];
+    } else {
+      horasData = Array.isArray(h) ? h : [];
+    }
     horasRealesData = (hr && !hr.error) ? hr : { tecnicos: [], horasSinCarga: [] };
+    if (hr && Array.isArray(hr.tecnicosSinCarga)) {
+      horasSinCargaTecnicos = hr.tecnicosSinCarga;
+    }
     renderHorasSubtab('billboard');
   } catch(e) {
     document.getElementById('horasContent').innerHTML = `<div class="alert alert-danger">Error al cargar horas: ${e.message}</div>`;
@@ -654,6 +673,17 @@ function renderHorasSubtab(subtab) {
       </div></div>`;
     }
     html += '</div>';
+    const sinCarga = (horasSinCargaTecnicos || []).filter(t => !filter || `${t.first_name} ${t.last_name}`.toLowerCase().includes(filter));
+    if (sinCarga.length) {
+      html += `<div class="mt-3 mb-2"><strong>Técnicos sin carga: ${sinCarga.length}</strong></div><div class="row g-3">`;
+      for (const t of sinCarga) {
+        const tecName = `${t.first_name} ${t.last_name}`;
+        html += `<div class="col-xl-3 col-lg-4 col-md-6"><div class="tech-card">
+          <div class="tech-header sin-carga"><div class="tech-name">${tecName}</div><div class="tech-hours">0:00</div><small>Sin carga</small></div>
+        </div></div>`;
+      }
+      html += '</div>';
+    }
     content.innerHTML = html;
   } else if (subtab === 'reales') {
     let data = horasRealesData;
@@ -691,6 +721,17 @@ function renderHorasSubtab(subtab) {
       </div></div>`;
     }
     html += '</div>';
+    const sinCargaReales = (horasSinCargaTecnicos || []).filter(t => !filter || `${t.first_name} ${t.last_name}`.toLowerCase().includes(filter));
+    if (sinCargaReales.length) {
+      html += `<div class="mt-3 mb-2"><strong>Técnicos sin carga: ${sinCargaReales.length}</strong></div><div class="row g-3">`;
+      for (const t of sinCargaReales) {
+        const tecName = `${t.first_name} ${t.last_name}`;
+        html += `<div class="col-xl-3 col-lg-4 col-md-6"><div class="tech-card">
+          <div class="tech-header sin-carga"><div class="tech-name">${tecName}</div><div class="tech-hours">0:00</div><small>Sin carga</small></div>
+        </div></div>`;
+      }
+      html += '</div>';
+    }
     content.innerHTML = html;
   } else {
     let tecnicos = horasRealesData?.tecnicos || [];
@@ -703,6 +744,15 @@ function renderHorasSubtab(subtab) {
       html += `<div class="billboard-card ${cls}" onclick="goToDetalleTecnico('${tecName.replace(/'/g, "\\'")}')" style="cursor:pointer"><div class="hours">${fmtHrs(h)}</div><div class="name">${tecName}</div></div>`;
     }
     html += '</div>';
+    const sinCargaBillboard = (horasSinCargaTecnicos || []).filter(t => !filter || `${t.first_name} ${t.last_name}`.toLowerCase().includes(filter));
+    if (sinCargaBillboard.length) {
+      html += `<div class="billboard-section-title">Sin carga (${sinCargaBillboard.length})</div><div class="billboard-grid">`;
+      for (const t of sinCargaBillboard) {
+        const tecName = `${t.first_name} ${t.last_name}`;
+        html += `<div class="billboard-card sin-carga" title="${tecName} - sin FS cargados"><div class="hours">0:00</div><div class="name">${tecName}</div></div>`;
+      }
+      html += '</div>';
+    }
     content.innerHTML = html;
   }
 }

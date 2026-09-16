@@ -93,6 +93,27 @@ const FS_WHERE = `
   AND u.id NOT IN ${EXCLUDED_USERS}
 `;
 
+async function getTecnicosSinCarga(date) {
+  const d = date || new Date().toISOString().split('T')[0];
+  const [rows] = await pool.query(`
+    SELECT u.first_name, u.last_name
+    FROM vtiger_users u
+    INNER JOIN vtiger_crmentity e ON u.id = e.smownerid AND e.deleted = 0
+    INNER JOIN vtiger_servicecontracts sc ON e.crmid = sc.servicecontractsid
+    INNER JOIN vtiger_servicecontractscf scf ON e.crmid = scf.servicecontractsid
+    WHERE scf.cf_932 IS NOT NULL
+      AND scf.cf_934 IS NOT NULL
+      AND u.deleted = 0
+      AND u.id NOT IN ${EXCLUDED_USERS}
+      AND scf.cf_960 <= ?
+      AND scf.cf_960 >= DATE_SUB(?, INTERVAL 30 DAY)
+    GROUP BY u.id
+    HAVING SUM(scf.cf_960 = ?) = 0
+    ORDER BY u.last_name, u.first_name
+  `, [d, d, d]);
+  return rows;
+}
+
 const AUSENCIA_CASE = `
   CASE
     WHEN scf.cf_1046 = 1 THEN '@@Ausente con Justificación'
@@ -177,7 +198,8 @@ async function getHoras(date) {
     GROUP BY u.id
     ORDER BY u.last_name, u.first_name
   `, [d]);
-  return rows;
+  const tecnicosSinCarga = await getTecnicosSinCarga(d);
+  return { tecnicos: rows, tecnicosSinCarga };
 }
 
 async function getFsDetalle(date, tecnico) {
@@ -314,7 +336,9 @@ async function getHorasReales(date) {
     `${a.last_name} ${a.first_name}`.localeCompare(`${b.last_name} ${b.first_name}`)
   );
 
-  return { tecnicos: finalResults, horasSinCarga };
+  const tecnicosSinCarga = await getTecnicosSinCarga(d);
+
+  return { tecnicos: finalResults, horasSinCarga, tecnicosSinCarga };
 }
 
 async function getHorasMensual(year, month) {
