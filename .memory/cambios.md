@@ -4,7 +4,7 @@ Historial de modificaciones. Más recientes primero. Referenciar commit si aplic
 
 ---
 
-## 2026-09-16 — Técnicos sin carga de horas en pestaña Horas
+## 2026-09-16 — Técnicos sin carga de horas en pestaña Horas (commit `c467f0e`)
 - `horas.service.js`: nuevo helper `getTecnicosSinCarga(date)` (técnicos con FS
   válido en los últimos 30 días que NO cargaron horas en la fecha consultada).
   Corregido con `HAVING SUM(cf_960 = ?) = 0` (un `!= ?` por fila causaba que
