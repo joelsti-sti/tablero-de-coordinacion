@@ -4,6 +4,21 @@ Estado actual, tareas en curso y próximos pasos.
 
 ---
 
+---
+
+## 2026-09-22 — Vacaciones/Ausencias/Llegadas tarde en Productividad (solo `kpi/`)
+
+- Implementado en `kpi/kpi-dev.service.js` el tratamiento de FS de vacaciones,
+  ausencias y llegadas tarde según reglas confirmadas con el usuario (jornada
+  9 hs; vacaciones no suman; ausencias/llegadas restan horas; ausencia total =
+  día no trabajado; pueden coexistir FS de trabajo + ausencia parcial el mismo
+  día). Nuevas columnas en la tabla "Productividad por Técnico"
+  (`kpi/kpi-dev.html`): Vacaciones (días), Ausencias y Lleg. Tarde (cant + h:mm).
+- Verificado con datos reales sep 2026 (Rene 7 vac, Santiago 2 vac, Alejandro
+  ausencia 9:00, Ulises ausencia parcial 2:00, Lautaro licencia + llegada tarde).
+- Pendiente: evaluar en uso real. Si se valida, replicar la misma lógica en
+  `horas.service.js`/`public/index.html` (dashboard principal) — decidir luego.
+
 ## 2026-09-21 — Mantenimientos Pendientes corregido (solo `kpi/`)
 
 - Se reemplazó la lógica de "Mantenimientos Pendientes" (antes: FS del mes sin

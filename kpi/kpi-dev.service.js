@@ -214,6 +214,8 @@ async function getKpiMensualDev(year, month, unidadNegocio, tipoSoporte) {
       COALESCE(scf.cf_1211, 0) as viaje_ida, COALESCE(scf.cf_1213, 0) as viaje_vuelta,
       scf.cf_922 as tipo_servicio, scf.cf_930 as codigo_tipo, scf.cf_958 as abonado_tipo,
       scf.cf_1026 as unidad_negocio,
+      COALESCE(scf.cf_1265, 0) as es_vacaciones,
+      TIME_TO_SEC(TIMEDIFF(scf.cf_934, scf.cf_932)) / 3600 as horas_cargadas,
       CASE
         WHEN scf.cf_1046 = 1 THEN 'Ausente con Justificación'
         WHEN scf.cf_1048 = 1 THEN 'Ausente sin aviso'
@@ -345,30 +347,43 @@ async function getKpiMensualDev(year, month, unidadNegocio, tipoSoporte) {
         dias_trabajados: new Set(), fs_total: 0,
         fs_presenciales: 0, fs_remotos: 0, fs_otros: 0,
         viaje_total: 0, ausencias: [], demoras: [], fs_list: [],
-        horas_por_dia: {}, dias_con_incidencia: new Set()
+        horas_por_dia: {}, dias_con_incidencia: new Set(),
+        dias_vacaciones: new Set(),
+        horas_ausencia_min: 0, horas_tardes_min: 0
       });
     }
     const t = tecMap.get(key);
     const horasVal = parseFloat(fs.horas) || 0;
-    t.horas_totales += horasVal;
-    if (fs.fecha) {
-      const dateKey = fs.fecha.substring(0, 10);
-      t.dias_trabajados.add(dateKey);
-      t.horas_por_dia[dateKey] = (t.horas_por_dia[dateKey] || 0) + horasVal;
-      if (fs.ausencia_tipo) t.dias_con_incidencia.add(dateKey);
-    }
-    t.fs_total++;
-    if (fs.modalidad === 'Presencial') t.fs_presenciales++;
-    else if (fs.modalidad === 'Remoto') t.fs_remotos++;
-    else t.fs_otros++;
-    t.viaje_total += (fs.viaje_ida || 0) + (fs.viaje_vuelta || 0);
-    if (fs.ausencia_tipo) {
-      if (fs.ausencia_tipo.includes('Llegada tarde')) {
+    const esVacaciones = Number(fs.es_vacaciones) === 1;
+    const esIncidencia = !esVacaciones && !!fs.ausencia_tipo;
+    const esLlegadaTarde = esIncidencia && fs.ausencia_tipo.includes('Llegada tarde');
+    if (esVacaciones) {
+      if (fs.fecha) {
+        const dateKey = fs.fecha.substring(0, 10);
+        t.dias_vacaciones.add(dateKey);
+      }
+    } else if (esIncidencia) {
+      if (esLlegadaTarde) {
+        t.horas_tardes_min += Math.round(horasVal * 60);
         t.demoras.push({ fecha: fs.fecha, tipo: fs.ausencia_tipo, fs: fs.contract_no });
       } else {
+        t.horas_ausencia_min += Math.round(horasVal * 60);
         t.ausencias.push({ fecha: fs.fecha, tipo: fs.ausencia_tipo, fs: fs.contract_no });
       }
+    } else {
+      t.horas_totales += horasVal;
+      if (fs.fecha) {
+        const dateKey = fs.fecha.substring(0, 10);
+        t.dias_trabajados.add(dateKey);
+        t.horas_por_dia[dateKey] = (t.horas_por_dia[dateKey] || 0) + horasVal;
+        if (fs.ausencia_tipo) t.dias_con_incidencia.add(dateKey);
+      }
+      t.fs_total++;
+      if (fs.modalidad === 'Presencial') t.fs_presenciales++;
+      else if (fs.modalidad === 'Remoto') t.fs_remotos++;
+      else t.fs_otros++;
     }
+    t.viaje_total += (fs.viaje_ida || 0) + (fs.viaje_vuelta || 0);
     const sinTicket = !relatedIds.has(fs.fs_id) && fs.sc_related_to !== 2;
     t.fs_list.push({
       fs_id: fs.fs_id, contract_no: fs.contract_no, subject: fs.subject,
@@ -376,6 +391,8 @@ async function getKpiMensualDev(year, month, unidadNegocio, tipoSoporte) {
       hora_inicio: fs.hora_inicio, hora_fin: fs.hora_fin,
       horas: fs.horas, modalidad: fs.modalidad,
       tipo_servicio: fs.tipo_servicio, unidad_negocio: fs.unidad_negocio || '',
+      es_vacaciones: esVacaciones ? 1 : 0,
+      tipo_incidencia: esIncidencia ? (esLlegadaTarde ? 'llegada_tarde' : 'ausencia') : '',
       sin_asociar: sinTicket
     });
   }
@@ -414,6 +431,13 @@ async function getKpiMensualDev(year, month, unidadNegocio, tipoSoporte) {
       viaje_total: t.viaje_total, ausencias: t.ausencias, demoras: t.demoras, fs_list: t.fs_list,
       viaje_total_hms: t.viaje_total > 0
         ? `${Math.floor(t.viaje_total / 60)}:${String(t.viaje_total % 60).padStart(2, '0')}`
+        : '0:00',
+      dias_vacaciones: t.dias_vacaciones.size,
+      horas_ausencia_hms: t.horas_ausencia_min > 0
+        ? `${Math.floor(t.horas_ausencia_min / 60)}:${String(t.horas_ausencia_min % 60).padStart(2, '0')}`
+        : '0:00',
+      horas_tardes_hms: t.horas_tardes_min > 0
+        ? `${Math.floor(t.horas_tardes_min / 60)}:${String(t.horas_tardes_min % 60).padStart(2, '0')}`
         : '0:00',
       tareas_completadas: tareas ? parseInt(tareas.total) : 0,
       tareas_sin_solucion: tareas ? parseInt(tareas.sin_solucion) : 0,

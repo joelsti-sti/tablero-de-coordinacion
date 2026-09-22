@@ -6,6 +6,34 @@ Historial de modificaciones. Más recientes primero. Referenciar commit si aplic
 
 ---
 
+## 2026-09-22 — Vacaciones / Ausencias / Llegadas tarde en Productividad (solo `kpi/`)
+- Reglas acordadas con el usuario (jornada técnica = 9 hs):
+  - **Vacaciones** (`scf.cf_1265 = 1`): NO suman a Dias trabajados ni a Horas;
+    se cuentan aparte en columnas/totales.
+  - **Ausencias** (cf_1046/1048/1050/1227) y **Llegadas tarde** (cf_1052/1054):
+    las horas cargadas en ese FS son **horas perdidas** → se restan del día laboral.
+    Ausencia total (9 hs) = día no trabajado. Pueden coexistir FS de trabajo +
+    FS de ausencia parcial el mismo día.
+- `kpi/kpi-dev.service.js`:
+  - La query de `fsRows` ya traía `es_vacaciones` y `horas_cargadas`. Se reescribe
+    el procesamiento `tecMap`:
+    - FS con `es_vacaciones=1` → cuenta `dias_vacaciones` (Set por fecha), NO suma
+      horas, NI días trabajados, NI fs_total.
+    - FS con `ausencia_tipo` (no vacaciones) → horas acumuladas en
+      `horas_ausencia_min` o `horas_tardes_min` (minutos), detalle en
+      `ausencias`/`demoras`; NO suma horas trabajadas ni días ni fs_total.
+    - FS normales → horas/días/fs_total/modadidad (como antes).
+  - Fix: `cf_1265` llega como string desde MySQL → se compara con `Number(...) === 1`.
+  - Por técnico se agregan `dias_vacaciones`, `horas_ausencia_hms`, `horas_tardes_hms`
+    (formato h:mm). Cada FS del `fs_list` marca `es_vacaciones` y `tipo_incidencia`.
+- `kpi/kpi-dev.html`: tabla "Productividad por Técnico" con 3 columnas nuevas
+  (Vacaciones en días; Ausencias y Lleg. tarde con cantidad + h:mm). Colspan del
+  drill por cliente ajustado a 15.
+- Verificado 2026-09: Rene Reyes → 8 días / 66.5 hs / 7 vacaciones (7-13 sep);
+  Santiago Costilla → 14 días / 121.13 hs / 2 vacaciones (21-22 sep);
+  Alejandro Cabero → ausencia 9:00 (21 sep) que no suma; Ulises Delgado →
+  ausencia parcial 2:00 (resta); Lautaro Romero → licencia 9:00 + llegada tarde 0:25.
+
 ## 2026-09-21 — Filtros por tipo de servicio / soporte (solo `kpi/`)
 - Los FS ya traen `cf_1026` (Tipo de servicio → unidad de negocio) y `cf_922`
   (Tipo de Soporte). Ahora el tablero dev los usa:
