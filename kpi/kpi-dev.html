@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI Mensual - DEV</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; color: #1a1a2e; }
+.container-main { max-width: 1400px; margin: 0 auto; padding: 1rem 1.25rem; }
+
+/* ===== PANEL ===== */
+.panel { background: #fff; border-radius: 8px; border: 1px solid #e8eaed; padding: 1.25rem; }
+.panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e8eaed; }
+.panel-header h5 { font-size: 0.9rem; font-weight: 600; color: #1a1a2e; margin: 0; }
+.panel-subtabs { display: flex; gap: 0.25rem; }
+.panel-subtabs .btn { font-size: 0.75rem; padding: 0.3rem 0.75rem; border-radius: 4px; font-weight: 500; border: 1px solid #d4d6da; color: #5f6368; background: #fff; }
+.panel-subtabs .btn.active { background: #1a2030; color: #fff; border-color: #1a2030; }
+.panel-tools { display: flex; align-items: center; gap: 0.5rem; }
+
+/* Tiempo por cliente: heatmap */
+.heatmap-wrap { overflow-x: auto; }
+.heatmap-table { border-collapse: collapse; font-size: 0.72rem; }
+.heatmap-table th, .heatmap-table td { border: 1px solid #e8eaed; padding: 4px 8px; text-align: center; white-space: nowrap; }
+.heatmap-table th { background: #f8f9fa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: #5f6368; }
+.heatmap-table td.hm-corner { background: #f8f9fa; }
+.hm-cell { position: relative; cursor: default; }
+.hm-cell .hm-num { font-weight: 600; }
+.hm-legend { display: flex; align-items: center; gap: 0.35rem; font-size: 0.7rem; color: #5f6368; }
+.hm-swatch { width: 18px; height: 10px; border-radius: 2px; }
+.bar-cell { padding: 0 2px; }
+.expand-btn { background: none; border: 1px solid #d4d6da; border-radius: 4px; color: #5f6368; cursor: pointer; font-size: 0.7rem; padding: 0 4px; }
+.expand-btn:hover { background: #f0f2f5; }
+
+/* ===== KPI ===== */
+.kpi-section { background: #fff; border: 1px solid #e8eaed; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
+.kpi-section h4 { font-size: 0.9rem; font-weight: 600; color: #1a1a2e; border-bottom: 2px solid #1a2030; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+.kpi-card { background: #f8f9fa; border-radius: 6px; padding: 1rem; text-align: center; border-left: 3px solid #1a2030; height: 100%; }
+.kpi-card .kpi-num { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+.kpi-card .kpi-label { font-size: 0.7rem; color: #5f6368; text-transform: uppercase; letter-spacing: 0.3px; }
+.kpi-card.danger { border-left-color: #c23333; } .kpi-card.danger .kpi-num { color: #c23333; }
+.kpi-card.warning { border-left-color: #c97a0c; } .kpi-card.warning .kpi-num { color: #c97a0c; }
+.kpi-card.success { border-left-color: #1b8a4a; } .kpi-card.success .kpi-num { color: #1b8a4a; }
+.kpi-card.info { border-left-color: #1a73e8; } .kpi-card.info .kpi-num { color: #1a73e8; }
+.kpi-card.secondary { border-left-color: #5f6368; } .kpi-card.secondary .kpi-num { color: #5f6368; }
+.kpi-badge-ok { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.68rem; font-weight: 600; }
+.kpi-badge-ok.cumplido { background: #e6f4ea; color: #1b8a4a; }
+.kpi-badge-ok.nocumplido { background: #fce8e8; color: #c23333; }
+.kpi-table th { background: #f8f9fa; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.3px; color: #5f6368; }
+.kpi-table td { font-size: 0.82rem; }
+.kpi-table .highlight-cell { font-weight: 700; font-size: 1rem; }
+.kpi-ausencia-item { display: inline-block; padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.68rem; margin: 1px; }
+.kpi-ausencia-item.justificado { background: #e6f4ea; color: #1b8a4a; }
+.kpi-ausencia-item.injustificado { background: #fce8e8; color: #c23333; }
+.kpi-ausencia-item.autorizado { background: #fef7e0; color: #c97a0c; }
+.kpi-ausencia-item.medica { background: #f0e6f6; color: #6c3b8a; }
+.kpi-ausencia-item.demora { background: #fef7e0; color: #c97a0c; }
+.kpi-tech-header { font-weight: 600; font-size: 0.95rem; color: #1a1a2e; }
+.kpi-progress { height: 4px; border-radius: 2px; background: #e8eaed; margin-top: 4px; }
+.kpi-progress .kpi-progress-bar { height: 100%; border-radius: 2px; background: #1b8a4a; transition: width 0.6s; }
+.kpi-pdf-header { display: none; text-align: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 2px solid #1a1a2e; }
+.kpi-pdf-header h2 { font-weight: 800; margin: 0; font-size: 1.2rem; }
+.kpi-pdf-header p { color: #5f6368; margin: 0; font-size: 0.8rem; }
+
+.table th { font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.3px; color: #5f6368; border-bottom: 2px solid #e8eaed; background: #f8f9fa; }
+.table td { font-size: 0.82rem; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<div class="container-main">
+  <div class="panel">
+    <div class="panel-header">
+      <h5>KPI Mensual <span class="badge bg-warning text-dark">DEV</span></h5>
+      <div class="panel-subtabs">
+        <button class="btn active" data-view="resumen">Resumen KPI</button>
+        <button class="btn" data-view="cliente">Tiempo por Cliente</button>
+      </div>
+      <div class="panel-tools">
+        <input type="month" id="kpiMes" class="form-control form-control-sm" style="width:160px">
+        <select id="filtroUnidad" class="form-select form-select-sm" style="width:180px"><option value="Todas">Todas las unidades</option></select>
+        <select id="filtroSoporte" class="form-select form-select-sm" style="width:180px"><option value="Todos">Todos los soportes</option></select>
+        <button class="btn btn-primary btn-sm" id="btnCargarKPI">Cargar</button>
+        <span id="kpiPeriodo"></span>
+        <button class="btn btn-outline-secondary btn-sm" id="btnExportKPI" style="display:none">📄 PDF</button>
+        <a class="btn btn-outline-secondary btn-sm" href="/">Volver al dashboard</a>
+      </div>
+    </div>
+    <div id="kpiContent" class="kpi-view"><div class="text-center py-5 text-muted">Hacé clic en Cargar</div></div>
+    <div id="clienteContent" class="kpi-view" style="display:none"><div class="text-center py-5 text-muted">Hacé clic en Cargar</div></div>
+  </div>
+</div>
+
+<script>
+let vtigerUrl = (() => { const v = '__VTIGER_URL__'; return v.startsWith('__') ? '' : v; })();
+let kpiTiempoDev = [];
+
+const CLIENT_PALETTE = ['#1a73e8','#ea4335','#fbbc04','#34a853','#9334e6','#ff6d01','#00acc1','#d81b60','#5f6368','#795548','#7cb342','#f4511e','#039be5','#c0ca33','#8e24aa','#00897b','#e53935','#3949ab','#43a047','#6d4c41','#00b8d4','#ef5350','#5c6bc0','#ffb300'];
+
+function fmtHrs(h) {
+  if (h == null || isNaN(h)) return '0:00';
+  const sign = h < 0 ? '-' : '';
+  h = Math.abs(h);
+  const hrs = Math.floor(h);
+  const mins = Math.round((h - hrs) * 60);
+  if (mins === 60) return sign + (hrs + 1) + ':00';
+  return sign + hrs + ':' + String(mins).padStart(2, '0');
+}
+
+document.getElementById('btnCargarKPI').addEventListener('click', loadKpi);
+document.getElementById('filtroUnidad').addEventListener('change', loadKpi);
+document.getElementById('filtroSoporte').addEventListener('change', loadKpi);
+
+async function cargarFiltros() {
+  try {
+    const res = await fetch('/api/kpi-dev/filtros');
+    const filtros = await res.json();
+    const selU = document.getElementById('filtroUnidad');
+    const selS = document.getElementById('filtroSoporte');
+    for (const u of filtros.unidades_negocio) {
+      const opt = document.createElement('option');
+      opt.value = u; opt.textContent = u;
+      selU.appendChild(opt);
+    }
+    for (const s of filtros.tipos_soporte) {
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      selS.appendChild(opt);
+    }
+  } catch (e) { /* sin filtros */ }
+}
+cargarFiltros();
+
+function mostrarCarga() {
+  const spinner = `<div class="text-center py-5"><div class="spinner-border spinner-border-lg text-primary" role="status"></div><p class="text-muted mt-3 mb-0">Procesando datos de ${new Date().toLocaleTimeString('es-AR')}...</p></div>`;
+  document.getElementById('kpiContent').innerHTML = spinner;
+  document.getElementById('clienteContent').innerHTML = `<div class="text-center py-5"><div class="spinner-border text-secondary" role="status"></div><p class="text-muted mt-3 mb-0">Procesando tiempo por cliente...</p></div>`;
+  document.getElementById('kpiPeriodo').innerHTML = '';
+}
+
+async function loadKpi() {
+  const val = document.getElementById('kpiMes').value;
+  const [year, month] = val.split('-');
+  const unidad = document.getElementById('filtroUnidad').value;
+  const soporte = document.getElementById('filtroSoporte').value;
+  mostrarCarga();
+  const btnCargar = document.getElementById('btnCargarKPI');
+  btnCargar.disabled = true;
+  try {
+    const unidadParam = unidad && unidad !== 'Todas' ? `&unidad=${encodeURIComponent(unidad)}` : '';
+    const soporteParam = soporte && soporte !== 'Todos' ? `&soporte=${encodeURIComponent(soporte)}` : '';
+    const [kpiResp, tiempoResp] = await Promise.all([
+      fetch(`/api/kpi-mensual-dev?year=${year}&month=${month}${unidadParam}${soporteParam}`),
+      fetch(`/api/kpi-dev/tiempo-clientes?year=${year}&month=${month}${unidadParam}${soporteParam}`).then(r => r.json()).catch(() => [])
+    ]);
+    const kpi = await kpiResp.json();
+    if (!kpi || kpi.error || !kpi.tecnicos) {
+      document.getElementById('kpiContent').innerHTML = `<div class="alert alert-warning">${kpi?.error || 'Sin datos para este mes'}</div>`;
+      document.getElementById('clienteContent').innerHTML = '';
+      document.getElementById('btnExportKPI').style.display = 'none';
+      return;
+    }
+    kpiTiempoDev = Array.isArray(tiempoResp) ? tiempoResp : [];
+    document.getElementById('btnExportKPI').style.display = 'inline-block';
+    renderKpi(kpi);
+    renderTiempoCliente(kpiTiempoDev, year, month);
+  } catch(e) {
+    document.getElementById('kpiContent').innerHTML = `<div class="alert alert-danger">Error: ${e.message}</div>`;
+    document.getElementById('btnExportKPI').style.display = 'none';
+  } finally {
+    document.getElementById('btnCargarKPI').disabled = false;
+  }
+}
+
+function renderKpi(data) {
+  const container = document.getElementById('kpiContent');
+  document.getElementById('kpiPeriodo').innerHTML = `<h4 class="mb-0 text-muted">${data.mes_nombre}</h4>`;
+
+  const tec = data.tecnicos;
+  const totalHoras = tec.reduce((s, t) => s + t.horas_totales, 0);
+  const totalFS = tec.reduce((s, t) => s + t.fs_total, 0);
+  const totalPresencial = tec.reduce((s, t) => s + t.fs_presenciales, 0);
+  const totalRemoto = tec.reduce((s, t) => s + t.fs_remotos, 0);
+  const totalAusencias = tec.reduce((s, t) => s + t.ausencias.length, 0);
+  const totalTareas = tec.reduce((s, t) => s + t.tareas_completadas, 0);
+  const totalTickets = tec.reduce((s, t) => s + t.tickets_resueltos, 0);
+  const mantPend = data.mantenimientos_pendientes.total;
+
+  function estadoKPI(cumple) { return cumple ? '<span class="kpi-badge-ok cumplido">Cumplido</span>' : '<span class="kpi-badge-ok nocumplido">Sin cumplir</span>'; }
+  const kpiUrgentes = data.kpi_tickets.urgentes_mas_24h.cantidad === 0;
+  const kpiAlta = data.kpi_tickets.alta_mas_7d.cantidad === 0;
+  const kpiBaja = data.kpi_tickets.baja_mas_30d.cantidad === 0;
+
+  let html = '';
+  // PDF Header
+  html += `<div class="kpi-pdf-header"><h2>CIERRE DE MES</h2><p>${data.mes_nombre} | Coordinacion STI</p></div>`;
+
+  // Executive Summary
+  html += `<div class="kpi-section"><h4>Resumen Ejecutivo</h4><div class="row g-3">
+    <div class="col-md-2 col-6"><div class="kpi-card success"><div class="kpi-num">${fmtHrs(totalHoras)}</div><div class="kpi-label">Horas Totales</div></div></div>
+    <div class="col-md-2 col-6"><div class="kpi-card info"><div class="kpi-num">${totalFS}</div><div class="kpi-label">FS Realizados</div></div></div>
+    <div class="col-md-2 col-6"><div class="kpi-card secondary"><div class="kpi-num">${totalPresencial}P / ${totalRemoto}R</div><div class="kpi-label">Presencial / Remoto</div></div></div>
+    <div class="col-md-2 col-6"><div class="kpi-card ${totalAusencias > 0 ? 'warning' : 'success'}"><div class="kpi-num">${totalAusencias}</div><div class="kpi-label">Ausencias / Demoras</div></div></div>
+    <div class="col-md-2 col-6"><div class="kpi-card success"><div class="kpi-num">${totalTareas}</div><div class="kpi-label">Tareas Completadas</div></div></div>
+    <div class="col-md-2 col-6"><div class="kpi-card info"><div class="kpi-num">${tec.reduce((s, t) => s + t.tickets_creados, 0)}C / ${totalTickets}R</div><div class="kpi-label">Tickets Creados / Resueltos</div></div></div>
+  </div></div>`;
+
+  // Desglose por unidad de negocio y tipo de soporte
+  if (data.desglose_unidad && data.desglose_unidad.length) {
+    const renderDesglose = (titulo, lista) => {
+      const filas = lista.map(d => `<tr><td>${d.nombre}</td><td class="text-center">${d.fs}</td><td class="text-center">${fmtHrs(d.horas)}</td></tr>`).join('');
+      return `<div class="col-md-6"><h5 style="font-size:0.8rem;font-weight:600;color:#1a1a2e;">${titulo}</h5><div class="table-responsive"><table class="table kpi-table table-sm"><thead><tr><th>${titulo.includes('Unidad') ? 'Unidad de negocio' : 'Tipo de soporte'}</th><th class="text-center">FS</th><th class="text-center">Horas</th></tr></thead><tbody>${filas}</tbody></table></div></div>`;
+    };
+    html += `<div class="kpi-section"><h4>Desglose por Tipo de Servicio</h4><div class="row g-3">${renderDesglose('Unidad de negocio', data.desglose_unidad)}${renderDesglose('Tipo de soporte', data.desglose_tipo_soporte || [])}</div></div>`;
+  }
+
+  // KPI Indicators
+  const totalCreados = tec.reduce((s, t) => s + t.tickets_creados, 0);
+  const totalResueltos = tec.reduce((s, t) => s + t.tickets_resueltos, 0);
+  const pctResolucion = totalCreados > 0 ? Math.round((totalResueltos / totalCreados) * 100) : 0;
+  html += `<div class="kpi-section"><h4>Indicadores de Gestion</h4><div class="row g-3">
+    <div class="col-md-3"><div class="card h-100 p-3"><div class="d-flex justify-content-between align-items-center"><div><small class="text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:0.5px;">Tickets Creados vs Resueltos</small><div class="fw-bold mt-1" style="font-size:1.3rem;">${totalCreados} / ${totalResueltos}</div><small class="text-muted">${pctResolucion}% resolucion</small></div><div>${estadoKPI(pctResolucion >= 80)}</div></div><div class="kpi-progress"><div class="kpi-progress-bar" style="width:${pctResolucion}%;${pctResolucion < 80 ? 'background:#f39c12' : ''}"></div></div></div></div>
+    <div class="col-md-3"><div class="card h-100 p-3"><div class="d-flex justify-content-between align-items-center"><div><small class="text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:0.5px;">Cero Tickets Urgentes &gt;24hs</small><div class="fw-bold mt-1" style="font-size:1.3rem;">${data.kpi_tickets.urgentes_mas_24h.cantidad}</div></div><div>${estadoKPI(kpiUrgentes)}</div></div><div class="kpi-progress"><div class="kpi-progress-bar" style="width:${kpiUrgentes ? 100 : 0}%;${!kpiUrgentes ? 'background:#dc3545' : ''}"></div></div></div></div>
+    <div class="col-md-3"><div class="card h-100 p-3"><div class="d-flex justify-content-between align-items-center"><div><small class="text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:0.5px;">Cero Tickets Alta &gt;7 dias</small><div class="fw-bold mt-1" style="font-size:1.3rem;">${data.kpi_tickets.alta_mas_7d.cantidad}</div></div><div>${estadoKPI(kpiAlta)}</div></div><div class="kpi-progress"><div class="kpi-progress-bar" style="width:${100 - Math.min(data.kpi_tickets.alta_mas_7d.cantidad * 5, 100)}%;${!kpiAlta ? 'background:#dc3545' : ''}"></div></div></div></div>
+    <div class="col-md-3"><div class="card h-100 p-3"><div class="d-flex justify-content-between align-items-center"><div><small class="text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:0.5px;">Mantenimientos Pendientes</small><div class="fw-bold mt-1" style="font-size:1.3rem;">${mantPend}</div></div><div>${estadoKPI(mantPend === 0)}</div></div><div class="kpi-progress"><div class="kpi-progress-bar" style="width:${100 - Math.min(mantPend * 10, 100)}%;${mantPend > 0 ? 'background:#f39c12' : ''}"></div></div></div></div>
+  </div></div>`;
+
+  // Tecnicos table
+  const tiempoMap = {};
+  for (const td of kpiTiempoDev) tiempoMap[td.nombre] = td;
+  html += `<div class="kpi-section"><h4>Productividad por Tecnico</h4><div class="table-responsive"><table class="table kpi-table table-hover"><thead><tr>
+    <th></th><th>Tecnico</th><th class="text-center">Dias</th><th class="text-center">Horas</th><th class="text-center">Prom. Diario</th><th class="text-center">Prom. Sin Inc.</th><th class="text-center">FS</th><th class="text-center">P/R</th><th class="text-center">Tareas</th><th class="text-center">Tickets Creados</th><th class="text-center">Tickets Resueltos</th><th class="text-center">Incidencias</th><th>Viaje</th>
+  </tr></thead><tbody>`;
+  let rowIdx = 0;
+  for (const t of tec) {
+    const ausenciasStr = t.ausencias.map(a => `<span class="kpi-ausencia-item ${a.tipo.includes('Justificación') ? 'justificado' : a.tipo.includes('Licencia') ? 'medica' : a.tipo.includes('autorizado') ? 'autorizado' : 'injustificado'}">${a.tipo}</span>`).join(' ');
+    const demorasStr = t.demoras.map(d => `<span class="kpi-ausencia-item demora">${d.tipo}</span>`).join(' ');
+    const incidenciasStr = ausenciasStr || demorasStr ? (ausenciasStr + ' ' + demorasStr) : '<span class="text-muted">-</span>';
+    const promSin = t.dias_sin_incidencia > 0 ? t.promedio_sin_incidencias : 0;
+    const tdT = tiempoMap[t.nombre];
+    const drillReal = tdT && tdT.clientes.length;
+    html += `<tr><td class="text-center">${drillReal ? `<button class="expand-btn" data-drill="drill-${rowIdx}" aria-label="Detalle por cliente">&gt;</button>` : ''}</td><td><div class="kpi-tech-header">${t.nombre}</div></td>
+      <td class="text-center highlight-cell">${t.dias_trabajados}</td>
+      <td class="text-center highlight-cell">${fmtHrs(t.horas_totales)}</td>
+      <td class="text-center">${fmtHrs(t.promedio_diario)}</td>
+      <td class="text-center">${fmtHrs(promSin)}</td>
+      <td class="text-center">${t.fs_total}</td>
+      <td class="text-center"><small>${t.fs_presenciales}P / ${t.fs_remotos}R</small></td>
+      <td class="text-center">${t.tareas_completadas}${t.tareas_sin_solucion > 0 ? `<br><small class="text-danger">${t.tareas_sin_solucion} sin sol.</small>` : ''}</td>
+      <td class="text-center highlight-cell">${t.tickets_creados}</td>
+      <td class="text-center">${t.tickets_resueltos}${t.tickets_sin_solucion > 0 ? `<br><small class="text-danger">${t.tickets_sin_solucion} sin sol.</small>` : ''}</td>
+      <td class="text-center">${incidenciasStr}</td>
+      <td><small class="text-muted">${t.viaje_total_hms}</small></td></tr>`;
+    if (drillReal) {
+      const rows = tdT.clientes.map(c => {
+        const pct = tdT.total_horas > 0 ? Math.round((c.horas / tdT.total_horas) * 100) : 0;
+        const swatch = clientColor(c.cliente);
+        const viaje = c.viaje_min ? Math.round(c.viaje_min / 6) / 10 + ' hs' : '−';
+        return `<tr><td><span class="hm-swatch" style="background:${swatch};display:inline-block;margin-right:6px;vertical-align:middle"></span>${c.cliente}</td><td class="text-center"><strong>${fmtHrs(c.horas)}</strong> <small class="text-muted">(${pct}%)</small></td><td class="text-center">${fmtHrs(c.horas_presencial)}</td><td class="text-center">${fmtHrs(c.horas_remoto)}</td><td class="text-center">${fmtHrs(c.horas_otro)}</td><td class="text-center">${viaje}</td><td class="text-center">${c.fs_count}</td></tr>`;
+      }).join('');
+      const resumenViaje = tdT.total_viaje_min ? ` · ${Math.round(tdT.total_viaje_min / 6) / 10} hs de viaje` : '';
+      html += `<tr id="drill-${rowIdx}" style="display:none"><td></td><td colspan="12" style="background:#f8f9fa;padding:0.75rem 1rem;"><div class="mb-2 text-muted" style="font-size:0.75rem">Detalle de horas por cliente — ${tdT.total_horas} hs totales${resumenViaje}</div><div class="table-responsive"><table class="table kpi-table table-sm mb-0"><thead><tr><th>Cliente</th><th class="text-center">Horas</th><th class="text-center">Presencial</th><th class="text-center">Remoto</th><th class="text-center">Otro</th><th class="text-center">Viaje</th><th class="text-center">FS</th></tr></thead><tbody>${rows}</tbody></table></div></td></tr>`;
+    }
+    rowIdx++;
+  }
+  html += '</tbody></table></div></div>';
+
+  // Mantenimientos pendientes
+  const pendProyectos = data.mantenimientos_pendientes.proyectos || [];
+  const badgeColor = (s) => {
+    s = (s || '').toLowerCase();
+    if (s === 'in progress' || s === 'on hold') return 'bg-danger';
+    if (s === 'validando') return 'bg-info';
+    if (s === 'sin iniciar') return 'bg-warning text-dark';
+    return 'bg-secondary';
+  };
+  if (mantPend > 0) {
+    html += `<div class="kpi-section"><h4>Mantenimientos Pendientes (${mantPend})</h4><p class="text-muted">Proyectos de mantenimiento del mes sin finalizar por la parte tecnica o pendientes de envio del informe</p><div class="table-responsive"><table class="table kpi-table table-sm"><thead><tr><th>Proyecto</th><th>Cliente</th><th>Modalidad</th><th>Estado</th><th>Inicio</th><th>Fin</th></tr></thead><tbody>`;
+    for (const p of pendProyectos) {
+      const projLink = vtigerUrl ? `${vtigerUrl}/index.php?module=Project&view=Detail&record=${p.projectid}` : null;
+      const estadoLabel = (p.projectstatus || '').toLowerCase() === 'validando' ? 'Falta enviar informe' : (p.projectstatus || '-');
+      html += `<tr><td>${projLink ? `<a href="${projLink}" target="_blank" rel="noreferrer"><strong>${p.projectname}</strong></a>` : `<strong>${p.projectname}</strong>`}<br><small class="text-muted">${p.project_no}</small></td><td>${p.cliente}</td><td><span class="badge ${(p.modalidad || '').toLowerCase() === 'remoto' ? 'bg-secondary' : 'bg-primary'}">${p.modalidad || '-'}</span></td><td><span class="badge ${badgeColor(p.projectstatus)}">${estadoLabel}</span></td><td>${p.startdate || '-'}</td><td>${p.targetenddate || '-'}</td></tr>`;
+    }
+    html += `</tbody></table></div></div>`;
+  } else {
+    html += `<div class="kpi-section"><h4>Mantenimientos Pendientes</h4><div class="alert alert-success text-center mb-0">Todos los proyectos de mantenimiento del mes estan finalizados.</div></div>`;
+  }
+
+  // Proyectos activos IT y Obras
+  const renderProyectosTipo = (lista, titulo, color) => {
+    if (!lista || !lista.length) {
+      return `<div class="kpi-section"><h4>${titulo}</h4><div class="alert alert-success text-center mb-0">Sin proyectos activos.</div></div>`;
+    }
+    let t = `<div class="kpi-section"><h4>${titulo} (${lista.length})</h4><div class="table-responsive"><table class="table kpi-table table-sm"><thead><tr><th>Proyecto</th><th>Cliente</th><th>Estado</th><th>Inicio</th><th>Fin</th></tr></thead><tbody>`;
+    for (const p of lista) {
+      const projLink = vtigerUrl ? `${vtigerUrl}/index.php?module=Project&view=Detail&record=${p.projectid}` : null;
+      const estadoLabel = (p.projectstatus || '').toLowerCase() === 'validando' ? 'Falta enviar informe' : (p.projectstatus || '-');
+      t += `<tr><td>${projLink ? `<a href="${projLink}" target="_blank" rel="noreferrer"><strong>${p.projectname}</strong></a>` : `<strong>${p.projectname}</strong>`}<br><small class="text-muted">${p.project_no}</small></td><td>${p.cliente}</td><td><span class="badge ${badgeColor(p.projectstatus)}">${estadoLabel}</span></td><td>${p.startdate || '-'}</td><td>${p.targetenddate || '-'}</td></tr>`;
+    }
+    t += `</tbody></table></div></div>`;
+    return t;
+  };
+
+  const itProyectos = data.proyectos_activos && data.proyectos_activos.src_it ? data.proyectos_activos.src_it : [];
+  const obrasProyectos = data.proyectos_activos && data.proyectos_activos.src_obras ? data.proyectos_activos.src_obras : [];
+  html += renderProyectosTipo(itProyectos, 'Soporte IT - Proyectos Activos', 'info');
+  html += renderProyectosTipo(obrasProyectos, 'Obras - Proyectos Activos', 'secondary');
+
+  // Tickets abiertos
+  html += `<div class="kpi-section"><h4>Incidencias Abiertas</h4>
+  <div class="row g-2 mb-3">
+    <div class="col-auto"><span class="badge bg-info fs-6">${totalCreados} Creados en el mes</span></div>
+    <div class="col-auto"><span class="badge bg-success fs-6">${totalResueltos} Resueltos en el mes</span></div>
+    <div class="col-auto"><span class="badge ${data.kpi_tickets.totales_abiertos > 0 ? 'bg-warning text-dark' : 'bg-success'} fs-6">${data.kpi_tickets.totales_abiertos} Abiertos actualmente</span></div>
+    <div class="col-auto"><span class="badge bg-secondary fs-6">${totalCreados - totalResueltos} Diferencia neta</span></div>
+  </div>
+  <p class="text-muted">Tickets abiertos clasificados por prioridad y tiempo de antigüedad:</p><div class="row g-3">`;
+  if (data.kpi_tickets.urgentes_mas_24h.cantidad > 0) {
+    html += `<div class="col-md-4"><div class="card border-danger p-3"><h6 class="text-danger">Urgentes >24hs (${data.kpi_tickets.urgentes_mas_24h.cantidad})</h6><ul class="list-unstyled mb-0" style="font-size:0.85rem;">`;
+    for (const t of data.kpi_tickets.urgentes_mas_24h.detalle.slice(0, 10)) html += `<li>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=HelpDesk&view=Detail&record=${t.ticketid}" target="_blank" rel="noreferrer">${t.ticket_no}</a>` : t.ticket_no} - ${t.cliente} (${t.dias_abierto}d)</li>`;
+    if (data.kpi_tickets.urgentes_mas_24h.detalle.length > 10) html += `<li class="text-muted">... y ${data.kpi_tickets.urgentes_mas_24h.detalle.length - 10} mas</li>`;
+    html += `</ul></div></div>`;
+  }
+  if (data.kpi_tickets.alta_mas_7d.cantidad > 0) {
+    html += `<div class="col-md-4"><div class="card border-warning p-3"><h6 class="text-warning">Alta >7dias (${data.kpi_tickets.alta_mas_7d.cantidad})</h6><ul class="list-unstyled mb-0" style="font-size:0.85rem;">`;
+    for (const t of data.kpi_tickets.alta_mas_7d.detalle.slice(0, 10)) html += `<li>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=HelpDesk&view=Detail&record=${t.ticketid}" target="_blank" rel="noreferrer">${t.ticket_no}</a>` : t.ticket_no} - ${t.cliente} (${t.dias_abierto}d)</li>`;
+    if (data.kpi_tickets.alta_mas_7d.detalle.length > 10) html += `<li class="text-muted">... y ${data.kpi_tickets.alta_mas_7d.detalle.length - 10} mas</li>`;
+    html += `</ul></div></div>`;
+  }
+  if (data.kpi_tickets.baja_mas_30d.cantidad > 0) {
+    html += `<div class="col-md-4"><div class="card border-secondary p-3"><h6 class="text-secondary">Baja >30dias (${data.kpi_tickets.baja_mas_30d.cantidad})</h6><ul class="list-unstyled mb-0" style="font-size:0.85rem;">`;
+    for (const t of data.kpi_tickets.baja_mas_30d.detalle.slice(0, 10)) html += `<li>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=HelpDesk&view=Detail&record=${t.ticketid}" target="_blank" rel="noreferrer">${t.ticket_no}</a>` : t.ticket_no} - ${t.cliente} (${t.dias_abierto}d)</li>`;
+    if (data.kpi_tickets.baja_mas_30d.detalle.length > 10) html += `<li class="text-muted">... y ${data.kpi_tickets.baja_mas_30d.detalle.length - 10} mas</li>`;
+    html += `</ul></div></div>`;
+  }
+  if (data.kpi_tickets.urgentes_mas_24h.cantidad === 0 && data.kpi_tickets.alta_mas_7d.cantidad === 0 && data.kpi_tickets.baja_mas_30d.cantidad === 0) {
+    html += '<div class="col-12"><div class="alert alert-success text-center mb-0">Sin incidencias criticas abiertas</div></div>';
+  }
+  html += `</div></div>`;
+
+  // Tareas/tickets sin solucion
+  const tareasPend = data.tareas_sin_solucion.length;
+  const ticketsPend = data.tickets_sin_solucion.length;
+  if (tareasPend > 0 || ticketsPend > 0) {
+    html += `<div class="kpi-section"><h4>Registros Cerrados sin Solucion</h4><div class="row g-3">`;
+    if (tareasPend > 0) {
+      html += `<div class="col-md-6"><div class="card p-3"><h6 class="text-danger">Tareas sin solucion (${tareasPend})</h6><div style="max-height:200px;overflow-y:auto;font-size:0.85rem;"><table class="table table-sm mb-0"><thead><tr><th>Tarea</th><th>Tecnico</th><th>Proyecto</th></tr></thead><tbody>`;
+      for (const t of data.tareas_sin_solucion) html += `<tr><td>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=ProjectTask&view=Detail&record=${t.projecttaskid}" target="_blank" rel="noreferrer">${t.projecttask_no}</a>` : (t.projecttask_no || '')}</td><td>${t.assigned_user || '-'}</td><td>${t.projectname || '-'}</td></tr>`;
+      html += `</tbody></table></div></div></div>`;
+    }
+    if (ticketsPend > 0) {
+      html += `<div class="col-md-6"><div class="card p-3"><h6 class="text-danger">Tickets sin solucion (${ticketsPend})</h6><div style="max-height:200px;overflow-y:auto;font-size:0.85rem;"><table class="table table-sm mb-0"><thead><tr><th>Ticket</th><th>Tecnico</th><th>Cliente</th></tr></thead><tbody>`;
+      for (const t of data.tickets_sin_solucion) html += `<tr><td>${vtigerUrl ? `<a href="${vtigerUrl}/index.php?module=HelpDesk&view=Detail&record=${t.ticketid}" target="_blank" rel="noreferrer">${t.ticket_no}</a>` : (t.ticket_no || '')}</td><td>${t.assigned_user || '-'}</td><td>${t.cliente || '-'}</td></tr>`;
+      html += `</tbody></table></div></div></div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  // Proximos mantenimientos
+  if (data.proximos_mantenimientos && data.proximos_mantenimientos.length > 0) {
+    html += `<div class="kpi-section"><h4>Proximos Mantenimientos Agendados (${data.proximos_mantenimientos.length})</h4><p class="text-muted">Proyectos de mantenimiento del proximo mes</p><div class="table-responsive"><table class="table kpi-table table-sm"><thead><tr><th>Proyecto</th><th>Cliente</th><th>Modalidad</th><th>Estado</th><th>Inicio</th><th>Fin</th></tr></thead><tbody>`;
+    for (const m of data.proximos_mantenimientos.slice(0, 20)) {
+      const projLink = vtigerUrl ? `${vtigerUrl}/index.php?module=Project&view=Detail&record=${m.projectid}` : null;
+      const estadoLabel = (m.projectstatus || '').toLowerCase() === 'validando' ? 'Falta enviar informe' : (m.projectstatus || '-');
+      html += `<tr><td>${projLink ? `<a href="${projLink}" target="_blank" rel="noreferrer"><strong>${m.projectname}</strong></a>` : `<strong>${m.projectname}</strong>`}<br><small class="text-muted">${m.project_no}</small></td><td>${m.cliente}</td><td><span class="badge ${(m.modalidad || '').toLowerCase() === 'remoto' ? 'bg-secondary' : 'bg-primary'}">${m.modalidad || '-'}</span></td><td><span class="badge ${badgeColor(m.projectstatus)}">${estadoLabel}</span></td><td>${m.startdate || '-'}</td><td>${m.targetenddate || '-'}</td></tr>`;
+    }
+    html += `</tbody></table></div></div>`;
+  } else {
+    html += `<div class="kpi-section"><h4>Proximos Mantenimientos Agendados</h4><div class="alert alert-success text-center mb-0">Sin proyectos de mantenimiento agendados para el proximo mes.</div></div>`;
+  }
+
+  // Estado tecnicos resumido
+  html += `<div class="kpi-section"><h4>Estado de Tecnicos Resumido</h4><div class="table-responsive"><table class="table kpi-table table-sm"><thead><tr>
+    <th>Tecnico</th><th class="text-center">Dias</th><th class="text-center">Horas</th><th class="text-center">Prom. Diario</th><th class="text-center">Prom. Sin Inc.</th><th class="text-center">FS/Dia</th><th class="text-center">Tickets Creados</th><th class="text-center">Tickets Resueltos</th><th class="text-center">Dif.</th><th class="text-center">Incidencias</th><th>Estado</th>
+  </tr></thead><tbody>`;
+  for (const t of tec) {
+    const promDiario = t.dias_trabajados > 0 ? fmtHrs(t.horas_totales / t.dias_trabajados) : '0:00';
+    const promSin = t.dias_sin_incidencia > 0 ? fmtHrs(t.promedio_sin_incidencias) : '0:00';
+    const fsDia = t.dias_trabajados > 0 ? (t.fs_total / t.dias_trabajados).toFixed(1) : '0.0';
+    const difTickets = t.tickets_creados - t.tickets_resueltos;
+    const difClass = difTickets > 0 ? 'text-danger' : difTickets < 0 ? 'text-success' : '';
+    const totalIncidencias = t.ausencias.length + t.demoras.length;
+    let estado = 'Normal', estadoClass = 'success';
+    if (totalIncidencias > 5 || difTickets > 5) { estado = 'Requiere atencion'; estadoClass = 'danger'; }
+    else if (totalIncidencias > 2 || difTickets > 2) { estado = 'Con observaciones'; estadoClass = 'warning'; }
+    html += `<tr><td><strong>${t.nombre}</strong></td>
+      <td class="text-center">${t.dias_trabajados}</td>
+      <td class="text-center">${fmtHrs(t.horas_totales)}</td>
+      <td class="text-center">${promDiario}</td>
+      <td class="text-center">${promSin}</td>
+      <td class="text-center">${fsDia}</td>
+      <td class="text-center highlight-cell">${t.tickets_creados}</td>
+      <td class="text-center">${t.tickets_resueltos}</td>
+      <td class="text-center ${difClass} fw-bold">${difTickets > 0 ? '+' : ''}${difTickets}</td>
+      <td class="text-center">${totalIncidencias > 0 ? `<span class="text-${estadoClass}">${totalIncidencias}</span>` : '-'}</td>
+      <td><span class="badge bg-${estadoClass}">${estado}</span></td></tr>`;
+  }
+  html += `</tbody></table></div></div>`;
+
+  container.innerHTML = html;
+}
+
+function escapeXml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function fmtHrsDec(h) {
+  return (Math.round(h * 100) / 100).toString().replace('.', ',');
+}
+
+function clientColor(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = ((h * 31) + name.charCodeAt(i)) >>> 0;
+  return CLIENT_PALETTE[h % CLIENT_PALETTE.length];
+}
+
+function topClientes(data, topN = 12) {
+  const acc = {};
+  for (const d of data) for (const c of d.clientes) acc[c.cliente] = (acc[c.cliente] || 0) + c.horas;
+  const arr = Object.entries(acc).sort((a, b) => b[1] - a[1]);
+  return arr.slice(0, topN).map(e => e[0]);
+}
+
+function renderStacked(data) {
+  const maxH = Math.max(...data.map(d => d.total_horas), 1);
+  const W = 920, H = 400, padL = 46, padR = 10, padT = 16, padB = 92;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  const n = data.length, barW = Math.max(chartW / n * 0.55, 26), gap = chartW / n * 0.45;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;font-family:Inter,sans-serif;display:block">`;
+  const ticks = 5;
+  for (let i = 0; i <= ticks; i++) {
+    const v = maxH / ticks * i;
+    const y = padT + chartH - (v / maxH) * chartH;
+    svg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#e8eaed" stroke-width="1"/>`;
+    svg += `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="11" fill="#5f6368">${fmtHrsDec(v)}</text>`;
+  }
+  data.forEach((d, i) => {
+    const x = padL + gap / 2 + i * (barW + gap);
+    let accY = padT + chartH;
+    d.clientes.forEach(c => {
+      const hPix = (c.horas / maxH) * chartH;
+      accY -= hPix;
+      svg += `<rect x="${x}" y="${accY}" width="${barW}" height="${Math.max(hPix, 0.5)}" fill="${clientColor(c.cliente)}" opacity="0.92"><title>${escapeXml(c.cliente)}: ${fmtHrsDec(c.horas)} hs (${c.horas_presencial} P / ${c.horas_remoto} R, viaje ${c.viaje_min} min, ${c.fs_count} FS)</title></rect>`;
+    });
+    svg += `<text x="${x + barW / 2}" y="${padT + chartH - (d.total_horas / maxH) * chartH - 6}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1a1a2e">${fmtHrsDec(d.total_horas)}</text>`;
+    const parts = d.nombre.split(' ');
+    const short = parts.length > 2 ? parts[0] + ' ' + parts[parts.length - 1] : d.nombre;
+    svg += `<text x="${x + barW / 2}" y="${padT + chartH + 16}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#202124">${escapeXml(short)}</text>`;
+  });
+  svg += `</svg>`;
+  return svg;
+}
+
+function renderHeatmap(data, top) {
+  const horasFor = (d, cli) => {
+    const c = d.clientes.find(x => x.cliente === cli);
+    return c ? c.horas : 0;
+  };
+  const maxCell = Math.max(0.1, ...data.flatMap(d => d.clientes.map(c => c.horas)));
+  const sorted = [...data].sort((a, b) => b.total_horas - a.total_horas);
+  let html = `<table class="heatmap-table"><thead><tr><th class="hm-corner">Tecnico \ Cliente</th>`;
+  for (const cli of top) html += `<th>${escapeXml(cli)}</th>`;
+  html += `<th>Total</th></tr></thead><tbody>`;
+  for (const d of sorted) {
+    html += `<tr><th>${escapeXml(d.nombre)}</th>`;
+    for (const cli of top) {
+      const h = horasFor(d, cli);
+      const alpha = h > 0 ? 0.08 + 0.87 * (h / maxCell) : 0;
+      const bg = h > 0 ? `rgba(214,48,49,${alpha.toFixed(3)})` : '#f8f9fa';
+      const col = h > maxCell * 0.55 ? '#fff' : '#202124';
+      html += `<td class="hm-cell" style="background:${bg};color:${col}"><span class="hm-num">${h > 0 ? fmtHrsDec(h) : ''}</span></td>`;
+    }
+    html += `<td><strong>${fmtHrsDec(d.total_horas)}</strong></td></tr>`;
+  }
+  html += `</tbody></table>`;
+  return html;
+}
+
+function renderTiempoCliente(data) {
+  const container = document.getElementById('clienteContent');
+  if (!data.length) {
+    container.innerHTML = '<div class="alert alert-info text-center py-4 mb-0">Sin datos de horas para este periodo.</div>';
+    return;
+  }
+  const top = topClientes(data, 12);
+  const legend = top.map(c => `<span style="white-space:nowrap"><span class="hm-swatch" style="background:${clientColor(c)};display:inline-block;vertical-align:middle"></span> ${escapeXml(c)}</span>`).join(' ');
+  const html = `
+    <div class="kpi-section">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap"><h4 class="mb-2">Horas por Cliente por Tecnico</h4><div class="hm-legend flex-wrap" style="gap:0.5rem;justify-content:flex-end">${legend}</div></div>
+      <div style="overflow-x:auto">${renderStacked(data)}</div>
+      <p class="text-muted mt-2 mb-0" style="font-size:0.75rem">Pasá el mouse sobre cada barra para ver el detalle por cliente. Las horas de viaje se informan por separado.</p>
+    </div>
+    <div class="kpi-section">
+      <h4>Mapa de Calor (Tecnico x Cliente)</h4>
+      <div class="heatmap-wrap">${renderHeatmap(data, top)}</div>
+      <div class="hm-legend mt-2"><span>0</span>
+        <span class="hm-swatch" style="background:rgba(214,48,49,0.08)"></span>
+        <span class="hm-swatch" style="background:rgba(214,48,49,0.3)"></span>
+        <span class="hm-swatch" style="background:rgba(214,48,49,0.55)"></span>
+        <span class="hm-swatch" style="background:rgba(214,48,49,0.8)"></span>
+        <span class="hm-swatch" style="background:rgba(214,48,49,1)"></span>
+        <span>maximo</span></div>
+    </div>`;
+  container.innerHTML = html;
+}
+
+document.querySelectorAll('.panel-subtabs .btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.panel-subtabs .btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.getAttribute('data-view');
+    document.getElementById('kpiContent').style.display = view === 'resumen' ? '' : 'none';
+    document.getElementById('clienteContent').style.display = view === 'cliente' ? '' : 'none';
+  });
+});
+
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.expand-btn');
+  if (btn) {
+    const row = document.getElementById(btn.getAttribute('data-drill'));
+    if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+  }
+});
+
+document.getElementById('btnExportKPI').addEventListener('click', function() {
+  const content = document.getElementById('kpiContent');
+  const pdfHeader = content.querySelector('.kpi-pdf-header');
+  if (pdfHeader) pdfHeader.style.display = 'block';
+  window.print();
+  setTimeout(() => { if (pdfHeader) pdfHeader.style.display = 'none'; }, 500);
+});
+
+(function() {
+  const now = new Date();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  document.getElementById('kpiMes').value = `${now.getFullYear()}-${m}`;
+  loadKpi();
+})();
+</script>
+</body>
+</html>

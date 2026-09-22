@@ -16,6 +16,7 @@ const {
   getTareasPendientes, getTicketsPendientes, getKpiMensual,
   getFsSinAsociarFull, getTecnicosMenor6Horas
 } = require('./src/services/horas.service');
+const { getKpiMensualDev, getTiempoPorCliente, getFiltrosDev } = require('./kpi/kpi-dev.service');
 const {
   getComputers, getComputersCross, getWorkgroups,
   getSummary, getServiceRecords
@@ -120,6 +121,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'kpi')));
 
 // ============================================================
 // CRM/OCS/ESET Comparison
@@ -367,6 +369,18 @@ app.get('/api/tecnicos-menor6', async (req, res, next) => {
 
 app.get('/api/kpi-mensual', async (req, res, next) => {
   try { res.json(await getKpiMensual(req.query.year, req.query.month)); } catch (err) { next(err); }
+});
+
+app.get('/api/kpi-mensual-dev', async (req, res, next) => {
+  try { res.json(await getKpiMensualDev(req.query.year, req.query.month, req.query.unidad, req.query.soporte)); } catch (err) { next(err); }
+});
+
+app.get('/api/kpi-dev/tiempo-clientes', async (req, res, next) => {
+  try { res.json(await getTiempoPorCliente(req.query.year, req.query.month, req.query.unidad, req.query.soporte)); } catch (err) { next(err); }
+});
+
+app.get('/api/kpi-dev/filtros', async (req, res, next) => {
+  try { res.json(await getFiltrosDev()); } catch (err) { next(err); }
 });
 
 // ============================================================
