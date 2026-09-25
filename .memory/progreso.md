@@ -6,6 +6,24 @@ Estado actual, tareas en curso y próximos pasos.
 
 ---
 
+## 2026-09-25 — Agentes instalados
+
+- Instalados 20 subagentes "Agency Agents" en `.opencode/agents/` (ver
+  `cambios.md`/`arquitectura.md`). Probar con `@backend-architect` o
+  `@database-optimizer` en próximas sesiones.
+
+## 2026-09-25 — Análisis del proyecto + contexto guardado
+
+- Análisis completo del repo (código, DBs, APIs, docs, git). Sin cambios de código.
+- Guardado contexto en `.memory/` (novedades de `cambios.md`/`progreso.md`,
+  conteos actualizados en `arquitectura.md`) y en OpenContext
+  (`.opencontext/{architecture,api-contracts,coding_rules}.md`).
+- Recordatorio: hay **cambios sin commitear** en working tree:
+  `kpi/kpi-dev.html` (filtros por columna + cabeceras sticky) y
+  `.memory/cambios.md`. Commitear cuando el usuario lo pida.
+- Próximos pasos vigentes (pendientes.md): P1 credenciales hardcodeadas,
+  P2 CORS+auth en `0.0.0.0`, P3 N+1 inventarios, P4 docs desactualizada.
+
 ## 2026-09-22 — Vacaciones/Ausencias/Llegadas tarde en Productividad (solo `kpi/`)
 
 - Implementado en `kpi/kpi-dev.service.js` el tratamiento de FS de vacaciones,

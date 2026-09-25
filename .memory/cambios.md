@@ -6,6 +6,41 @@ Historial de modificaciones. Más recientes primero. Referenciar commit si aplic
 
 ---
 
+## 2026-09-25 — Instalación de 20 subagentes "Agency Agents" en `.opencode/agents/`
+- Desde https://github.com/msitarzewski/agency-agents (clonado a temp): se
+  generaron los archivos opencode (`convert.sh --tool opencode`) y se copiaron
+  20 agentes al proyecto (`.opencode/agents/`), seleccionados según el
+  portfolio de ~14 proyectos en `../proyectos_IA`.
+- 14 ingeniería + 3 seguridad + 2 gestión + 1 testing (lista completa en
+  `arquitectura.md`). Disponibles como subagentes (`@mention` / Task).
+- Se descartó el `install.sh` del repo (TUI se colgaba en este entorno); la
+  copia manual es equivalente (mismos archivos generados).
+
+## 2026-09-25 — Análisis completo del proyecto y guardado de contexto
+- Revisión integral del repo (server, services, utils, db, config, frontend,
+  docs, git). Sin cambios de código.
+- Actualizados `.memory/arquitectura.md` (conteos de líneas y copia DEV KPI).
+- Creado contexto OpenContext `.opencontext/` (topics `architecture`,
+  `api-contracts`, `coding_rules`) para memoria compartida automática.
+- Confirmado: cambios sin commitear previos (`kpi/kpi-dev.html` filtros de
+  columna + cabeceras sticky y `.memory/cambios.md`).
+
+## 2026-09-22 — Filtros por columna en cabeceras KPI (solo `kpi/`)
+- `kpi/kpi-dev.html`:
+  - Cabeceras fijas (`table-sticky`, sticky thead) ahora incluyen un input de
+    filtro por columna (`.kpi-filter`) en "Productividad por Tecnico" y
+    "Mantenimientos Pendientes".
+  - Nueva `wireKpiFilters()` (kpi/kpi-dev.html:414): filtra filas por texto
+    case-insensitive; las filas de drill (`data-kpi-skip`) se ocultan si su
+    técnico queda filtrado. Los inputs se ocultan al imprimir/PDF.
+
+## 2026-09-22 — Cabeceras fijas en tablas KPI (solo `kpi/`)
+- `kpi/kpi-dev.html`:
+  - Nueva clase `.table-sticky` (`max-height: 32rem; overflow-y: auto`) con
+    `thead th { position: sticky; top: 0 }`.
+  - Aplicada a las tablas "Productividad por Tecnico" y "Mantenimientos
+    Pendientes" para que la cabecera quede fija al desplazarse dentro de la tabla.
+
 ## 2026-09-22 — Vacaciones / Ausencias / Llegadas tarde en Productividad (solo `kpi/`)
 - Reglas acordadas con el usuario (jornada técnica = 9 hs):
   - **Vacaciones** (`scf.cf_1265 = 1`): NO suman a Dias trabajados ni a Horas;
