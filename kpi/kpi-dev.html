@@ -51,6 +51,12 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: #f0f2f5; col
 .kpi-table th { background: #f8f9fa; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.3px; color: #5f6368; }
 .kpi-table td { font-size: 0.82rem; }
 .kpi-table .highlight-cell { font-weight: 700; font-size: 1rem; }
+.table-sticky { max-height: 32rem; overflow-y: auto; }
+.table-sticky thead th { position: sticky; top: 0; z-index: 2; background: #f8f9fa; box-shadow: inset 0 -1px 0 #e8eaed; }
+.kpi-filter { width: 100%; min-width: 40px; margin-top: 4px; border: 1px solid #d4d6da; border-radius: 4px; font-size: 0.68rem; font-weight: 400; text-transform: none; letter-spacing: 0; padding: 2px 6px; color: #202124; background: #fff; }
+.kpi-filter:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.15); }
+.kpi-filter::placeholder { color: #9aa0a6; }
+@media print { .kpi-filter { display: none; } }
 .kpi-ausencia-item { display: inline-block; padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.68rem; margin: 1px; }
 .kpi-ausencia-item.justificado { background: #e6f4ea; color: #1b8a4a; }
 .kpi-ausencia-item.injustificado { background: #fce8e8; color: #c23333; }
@@ -230,8 +236,8 @@ function renderKpi(data) {
   // Tecnicos table
   const tiempoMap = {};
   for (const td of kpiTiempoDev) tiempoMap[td.nombre] = td;
-  html += `<div class="kpi-section"><h4>Productividad por Tecnico</h4><div class="table-responsive"><table class="table kpi-table table-hover"><thead><tr>
-    <th></th><th>Tecnico</th><th class="text-center">Dias</th><th class="text-center">Horas</th><th class="text-center">Prom. Diario</th><th class="text-center">Prom. Sin Inc.</th><th class="text-center">FS</th><th class="text-center">P/R</th><th class="text-center">Tareas</th><th class="text-center">Tickets Creados</th><th class="text-center">Tickets Resueltos</th><th class="text-center">Vacaciones</th><th class="text-center">Ausencias</th><th class="text-center">Lleg. Tarde</th><th class="text-center">Incidencias</th><th>Viaje</th>
+  html += `<div class="kpi-section"><h4>Productividad por Tecnico</h4><div class="table-responsive table-sticky"><table class="table kpi-table table-hover" data-kpi-filters><thead><tr>
+    <th></th><th>Tecnico<input type="search" class="kpi-filter" data-col="1" placeholder="Buscar"></th><th class="text-center">Dias<input type="search" class="kpi-filter" data-col="2" placeholder="Buscar"></th><th class="text-center">Horas<input type="search" class="kpi-filter" data-col="3" placeholder="Buscar"></th><th class="text-center">Prom. Diario<input type="search" class="kpi-filter" data-col="4" placeholder="Buscar"></th><th class="text-center">Prom. Sin Inc.<input type="search" class="kpi-filter" data-col="5" placeholder="Buscar"></th><th class="text-center">FS<input type="search" class="kpi-filter" data-col="6" placeholder="Buscar"></th><th class="text-center">P/R<input type="search" class="kpi-filter" data-col="7" placeholder="Buscar"></th><th class="text-center">Tareas<input type="search" class="kpi-filter" data-col="8" placeholder="Buscar"></th><th class="text-center">Tickets Creados<input type="search" class="kpi-filter" data-col="9" placeholder="Buscar"></th><th class="text-center">Tickets Resueltos<input type="search" class="kpi-filter" data-col="10" placeholder="Buscar"></th><th class="text-center">Vacaciones<input type="search" class="kpi-filter" data-col="11" placeholder="Buscar"></th><th class="text-center">Ausencias<input type="search" class="kpi-filter" data-col="12" placeholder="Buscar"></th><th class="text-center">Lleg. Tarde<input type="search" class="kpi-filter" data-col="13" placeholder="Buscar"></th><th class="text-center">Incidencias<input type="search" class="kpi-filter" data-col="14" placeholder="Buscar"></th><th>Viaje<input type="search" class="kpi-filter" data-col="15" placeholder="Buscar"></th>
   </tr></thead><tbody>`;
   let rowIdx = 0;
   for (const t of tec) {
@@ -264,7 +270,7 @@ function renderKpi(data) {
         return `<tr><td><span class="hm-swatch" style="background:${swatch};display:inline-block;margin-right:6px;vertical-align:middle"></span>${c.cliente}</td><td class="text-center"><strong>${fmtHrs(c.horas)}</strong> <small class="text-muted">(${pct}%)</small></td><td class="text-center">${fmtHrs(c.horas_presencial)}</td><td class="text-center">${fmtHrs(c.horas_remoto)}</td><td class="text-center">${fmtHrs(c.horas_otro)}</td><td class="text-center">${viaje}</td><td class="text-center">${c.fs_count}</td></tr>`;
       }).join('');
       const resumenViaje = tdT.total_viaje_min ? ` · ${Math.round(tdT.total_viaje_min / 6) / 10} hs de viaje` : '';
-      html += `<tr id="drill-${rowIdx}" style="display:none"><td></td><td colspan="15" style="background:#f8f9fa;padding:0.75rem 1rem;"><div class="mb-2 text-muted" style="font-size:0.75rem">Detalle de horas por cliente — ${tdT.total_horas} hs totales${resumenViaje}</div><div class="table-responsive"><table class="table kpi-table table-sm mb-0"><thead><tr><th>Cliente</th><th class="text-center">Horas</th><th class="text-center">Presencial</th><th class="text-center">Remoto</th><th class="text-center">Otro</th><th class="text-center">Viaje</th><th class="text-center">FS</th></tr></thead><tbody>${rows}</tbody></table></div></td></tr>`;
+      html += `<tr id="drill-${rowIdx}" data-kpi-skip style="display:none"><td></td><td colspan="15" style="background:#f8f9fa;padding:0.75rem 1rem;"><div class="mb-2 text-muted" style="font-size:0.75rem">Detalle de horas por cliente — ${tdT.total_horas} hs totales${resumenViaje}</div><div class="table-responsive"><table class="table kpi-table table-sm mb-0"><thead><tr><th>Cliente</th><th class="text-center">Horas</th><th class="text-center">Presencial</th><th class="text-center">Remoto</th><th class="text-center">Otro</th><th class="text-center">Viaje</th><th class="text-center">FS</th></tr></thead><tbody>${rows}</tbody></table></div></td></tr>`;
     }
     rowIdx++;
   }
@@ -280,7 +286,7 @@ function renderKpi(data) {
     return 'bg-secondary';
   };
   if (mantPend > 0) {
-    html += `<div class="kpi-section"><h4>Mantenimientos Pendientes (${mantPend})</h4><p class="text-muted">Proyectos de mantenimiento del mes sin finalizar por la parte tecnica o pendientes de envio del informe</p><div class="table-responsive"><table class="table kpi-table table-sm"><thead><tr><th>Proyecto</th><th>Cliente</th><th>Modalidad</th><th>Estado</th><th>Inicio</th><th>Fin</th></tr></thead><tbody>`;
+    html += `<div class="kpi-section"><h4>Mantenimientos Pendientes (${mantPend})</h4><p class="text-muted">Proyectos de mantenimiento del mes sin finalizar por la parte tecnica o pendientes de envio del informe</p><div class="table-responsive table-sticky"><table class="table kpi-table table-sm" data-kpi-filters><thead><tr><th>Proyecto<input type="search" class="kpi-filter" data-col="0" placeholder="Buscar"></th><th>Cliente<input type="search" class="kpi-filter" data-col="1" placeholder="Buscar"></th><th>Modalidad<input type="search" class="kpi-filter" data-col="2" placeholder="Buscar"></th><th>Estado<input type="search" class="kpi-filter" data-col="3" placeholder="Buscar"></th><th>Inicio<input type="search" class="kpi-filter" data-col="4" placeholder="Buscar"></th><th>Fin<input type="search" class="kpi-filter" data-col="5" placeholder="Buscar"></th></tr></thead><tbody>`;
     for (const p of pendProyectos) {
       const projLink = vtigerUrl ? `${vtigerUrl}/index.php?module=Project&view=Detail&record=${p.projectid}` : null;
       const estadoLabel = (p.projectstatus || '').toLowerCase() === 'validando' ? 'Falta enviar informe' : (p.projectstatus || '-');
@@ -403,6 +409,28 @@ function renderKpi(data) {
   html += `</tbody></table></div></div>`;
 
   container.innerHTML = html;
+  wireKpiFilters(container);
+}
+
+function wireKpiFilters(root) {
+  root.querySelectorAll('table[data-kpi-filters]').forEach(tbl => {
+    tbl.querySelectorAll('.kpi-filter').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const col = +inp.dataset.col;
+        const q = inp.value.trim().toLowerCase();
+        tbl.querySelectorAll('tbody tr').forEach(tr => {
+          if (tr.dataset.kpiSkip) return;
+          const cell = tr.children[col];
+          const txt = cell ? cell.textContent.toLowerCase() : '';
+          const show = q === '' || txt.includes(q);
+          tr.style.display = show ? '' : 'none';
+          if (!show && tr.nextElementSibling && tr.nextElementSibling.dataset.kpiSkip) {
+            tr.nextElementSibling.style.display = 'none';
+          }
+        });
+      });
+    });
+  });
 }
 
 function escapeXml(s) {
